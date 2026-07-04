@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="assets/images/logo.png" type="image/png" />
+  <title>Feedback & Testimonials — Apex Education Center</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body data-page="feedback">
+  <div class="page-loader"><svg class="loader-mark" viewBox="0 0 32 32"><path d="M16 4 L28 26 L4 26 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12 L23 26 L9 26 Z" fill="currentColor"/></svg></div>
+
+  <div id="site-header"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow">Testimonials</span>
+        <h1>What our students say</h1>
+        <p>Real feedback from real families. Share your own experience below.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="card-grid" id="allTestimonials"></div>
+      </div>
+    </section>
+
+    <section class="section-alt">
+      <div class="container" style="max-width:640px;">
+        <div class="section-head">
+          <span class="eyebrow">Share Your Experience</span>
+          <h2>Leave feedback</h2>
+        </div>
+        <div class="form-card">
+          <div class="alert" id="feedbackAlert"></div>
+          <form id="feedbackForm" novalidate>
+            <div class="form-group">
+              <label for="feedbackName">Your Name</label>
+              <input type="text" id="feedbackName" name="feedbackName" placeholder="Your name" />
+              <span class="field-error" data-error-for="feedbackName"></span>
+            </div>
+            <div class="form-group">
+              <label>Rating</label>
+              <div class="star-rating-input" id="starRatingInput"></div>
+              <input type="hidden" id="ratingValue" />
+              <span class="field-error" data-error-for="rating"></span>
+            </div>
+            <div class="form-group">
+              <label for="feedbackComment">Comment</label>
+              <textarea id="feedbackComment" name="feedbackComment" rows="4" placeholder="Tell us about your experience…"></textarea>
+              <span class="field-error" data-error-for="feedbackComment"></span>
+            </div>
+            <p class="field-hint" style="margin-bottom:16px;">Submitted feedback is reviewed before it appears publicly.</p>
+            <button type="submit" class="btn btn-primary btn-block btn-lg btn-magnetic">Submit Feedback</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/feedback.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="assets/images/logo.png" type="image/png" />
+  <title>Register — Apex Education Center</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body data-page="registration">
+  <div class="page-loader"><svg class="loader-mark" viewBox="0 0 32 32"><path d="M16 4 L28 26 L4 26 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12 L23 26 L9 26 Z" fill="currentColor"/></svg></div>
+
+  <div id="site-header"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow">Get Started</span>
+        <h1>Register for a session</h1>
+        <p>Fill out the form below and we'll confirm your session within 24 hours.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container" style="max-width:640px;">
+        <div class="form-card">
+          <div class="alert" id="registrationAlert"></div>
+          <form id="registrationForm" novalidate>
+            <div class="form-group">
+              <label for="studentName">Full Name</label>
+              <input type="text" id="studentName" name="studentName" placeholder="Your full name" />
+              <span class="field-error" data-error-for="studentName"></span>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="you@example.com" />
+              <span class="field-error" data-error-for="email"></span>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone (optional)</label>
+              <input type="tel" id="phone" name="phone" placeholder="+961 xx xxx xxx" />
+              <span class="field-error" data-error-for="phone"></span>
+            </div>
+            <div class="form-group">
+              <label for="courseId">Course</label>
+              <select id="courseId" name="courseId"></select>
+            </div>
+            <div class="form-group">
+              <label for="notes">Notes (optional)</label>
+              <textarea id="notes" name="notes" rows="3" placeholder="Preferred days, topics to focus on, etc."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg btn-magnetic">Submit Registration</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

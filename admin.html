@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="assets/images/logo.png" type="image/png" />
+  <title>Admin Login — Apex Education Center</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body data-page="admin">
+  <div class="admin-login-shell">
+    <div class="admin-login-card">
+      <span class="brand-mark" style="width:64px;height:64px;border-radius:16px;margin:0 auto 18px;"><img src="assets/images/logo.png" alt="Apex Education Center" /></span>
+      <h1 style="font-size:1.6rem;">Admin Command Center</h1>
+      <p style="margin:8px 0 26px;">Sign in to manage courses, instructors, and site content.</p>
+
+      <form id="adminLoginForm" novalidate>
+        <div class="form-group" style="text-align:left;">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter admin password" autofocus />
+        </div>
+        <div class="field-error show" id="loginError" style="text-align:left;margin-bottom:12px;"></div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Sign In</button>
+      </form>
+
+      <p class="field-hint" style="margin-top:22px;">Default password: <code>admin123</code> — change it after first login.</p>
+      <a href="index.html" class="btn btn-ghost btn-sm" style="margin-top:10px;">&larr; Back to site</a>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
