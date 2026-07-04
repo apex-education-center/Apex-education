@@ -1,0 +1,246 @@
+/**
+ * components.js
+ * Injects the shared site header and footer into every page, and wires up
+ * the behaviors that go with them: mobile menu, sticky nav shadow,
+ * scroll-to-top button, active-link highlighting, and smooth scrolling.
+ * Each HTML page just needs <div id="site-header"></div> and
+ * <div id="site-footer"></div> placeholders.
+ */
+
+const NAV_LINKS = [
+  { href: "index.html", label: "Home", page: "home" },
+  { href: "about.html", label: "About", page: "about" },
+  { href: "courses.html", label: "Courses", page: "courses" },
+  { href: "instructors.html", label: "Instructors", page: "instructors" },
+  { href: "schedule.html", label: "Schedule", page: "schedule" },
+  { href: "faq.html", label: "FAQ", page: "faq" },
+  { href: "contact.html#contact-owner", label: "Contact Owner", page: "contact" },
+];
+
+function renderHeader() {
+  const mount = document.getElementById("site-header");
+  if (!mount) return;
+  const current = document.body.dataset.page || "";
+
+  mount.innerHTML = `
+    <header class="site-header" id="siteHeader">
+      <div class="container header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <img src="assets/images/logo.png" alt="" />
+          </span>
+          <span class="brand-text">Apex<span class="brand-sub">Education Center</span></span>
+        </a>
+
+        <nav class="main-nav" id="mainNav" aria-label="Main navigation">
+          <ul>
+            ${NAV_LINKS.map(
+              (l) => `<li><a href="${l.href}" class="${l.page === current ? "active" : ""}">${l.label}</a></li>`
+            ).join("")}
+          </ul>
+        </nav>
+
+        <div class="header-actions">
+          <a href="registration.html" class="btn btn-accent btn-sm btn-magnetic">Register</a>
+          <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+  `;
+}
+
+async function renderFooter() {
+  const mount = document.getElementById("site-footer");
+  if (!mount) return;
+
+  const info = (typeof ApexDB !== "undefined" && (await ApexDB.getSiteInfo())) || {};
+  const social = info.social || {};
+
+  mount.innerHTML = `
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div class="footer-brand">
+          <div style="display:flex;align-items:center;gap:11px;margin-bottom:4px;">
+            <span class="brand-mark" aria-hidden="true"><img src="assets/images/logo.png" alt="" /></span>
+            <span class="brand-text light">Apex<span class="brand-sub">Education Center</span></span>
+          </div>
+          <p>${info.tagline || "Private tutoring, elevated."}</p>
+          <div class="social-links">
+            ${social.facebook ? `<a href="${social.facebook}" target="_blank" rel="noopener noreferrer" aria-label="Facebook">${iconSvg("facebook")}</a>` : ""}
+            ${social.instagram ? `<a href="${social.instagram}" target="_blank" rel="noopener noreferrer" aria-label="Instagram">${iconSvg("instagram")}</a>` : ""}
+            ${info.whatsapp ? `<a href="https://wa.me/${info.whatsapp}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">${iconSvg("whatsapp")}</a>` : ""}
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="courses.html">Courses</a></li>
+            <li><a href="instructors.html">Instructors</a></li>
+            <li><a href="schedule.html">Schedule</a></li>
+            <li><a href="feedback.html">Testimonials</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="contact.html#contact-owner">Contact Owner</a></li>
+            <li><a href="registration.html">Register</a></li>
+            <li><a href="admin.html">Admin</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Get in Touch</h4>
+          <ul class="footer-contact">
+            <li>${info.address || ""}</li>
+            <li><a href="mailto:${info.email || ""}">${info.email || ""}</a></li>
+            <li><a href="tel:${info.phone || ""}">${info.phone || ""}</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="container footer-bottom-inner">
+          <p>&copy; ${new Date().getFullYear()} Apex Education Center. All rights reserved.</p>
+          <button id="scrollTopBtn" class="scroll-top" aria-label="Scroll to top">${iconSvg("arrow-up")}</button>
+        </div>
+      </div>
+    </footer>
+  `;
+
+  wireScrollTop();
+}
+
+function iconSvg(name) {
+  const icons = {
+    facebook: `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13.5 21v-7.5H16l.5-3.5h-3V7.8c0-1 .3-1.7 1.7-1.7H16.6V3.1C16.2 3 15.2 3 14 3c-2.6 0-4.4 1.6-4.4 4.5v2.5H7v3.5h2.6V21h3.9z"/></svg>`,
+    instagram: `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.2c2.7 0 3 0 4.1.06 1.1.05 1.8.22 2.2.36.6.23 1 .5 1.4.9.4.4.7.9.9 1.4.15.4.3 1.1.36 2.2.06 1.2.06 1.5.06 4.1s0 3-.06 4.1c-.05 1.1-.22 1.8-.36 2.2a4 4 0 0 1-.9 1.4 4 4 0 0 1-1.4.9c-.4.15-1.1.3-2.2.36-1.2.06-1.5.06-4.1.06s-3 0-4.1-.06c-1.1-.05-1.8-.22-2.2-.36a4 4 0 0 1-1.4-.9 4 4 0 0 1-.9-1.4c-.15-.4-.3-1.1-.36-2.2C2.2 15 2.2 14.7 2.2 12s0-3 .06-4.1c.05-1.1.22-1.8.36-2.2.23-.6.5-1 .9-1.4.4-.4.9-.7 1.4-.9.4-.15 1.1-.3 2.2-.36C8.2 2.2 8.5 2.2 12 2.2Zm0 1.8c-2.6 0-2.9 0-3.9.06-.9.04-1.4.18-1.7.3-.4.16-.7.35-1 .65-.3.3-.5.6-.65 1-.12.3-.26.8-.3 1.7C4.4 9.1 4.4 9.4 4.4 12s0 2.9.06 3.9c.04.9.18 1.4.3 1.7.16.4.35.7.65 1 .3.3.6.5 1 .65.3.12.8.26 1.7.3 1 .06 1.3.06 3.9.06s2.9 0 3.9-.06c.9-.04 1.4-.18 1.7-.3.4-.16.7-.35 1-.65.3-.3.5-.6.65-1 .12-.3.26-.8.3-1.7.06-1 .06-1.3.06-3.9s0-2.9-.06-3.9c-.04-.9-.18-1.4-.3-1.7a2.6 2.6 0 0 0-.65-1 2.6 2.6 0 0 0-1-.65c-.3-.12-.8-.26-1.7-.3-1-.06-1.3-.06-3.9-.06Zm0 3.4a4.6 4.6 0 1 1 0 9.2 4.6 4.6 0 0 1 0-9.2Zm0 1.8a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Zm4.8-2a1.08 1.08 0 1 1 0 2.16 1.08 1.08 0 0 1 0-2.16Z"/></svg>`,
+    whatsapp: `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.7-.85-2-.94-.27-.1-.46-.15-.65.15-.2.3-.75.94-.9 1.13-.17.2-.34.22-.63.08-.3-.15-1.24-.46-2.35-1.46-.87-.78-1.46-1.73-1.63-2.03-.17-.3-.02-.46.13-.6.13-.14.3-.34.44-.5.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.65-1.58-.9-2.16-.24-.57-.48-.5-.65-.5h-.56c-.2 0-.5.07-.77.37s-1.02 1-1.02 2.44 1.05 2.83 1.2 3.03c.15.2 2.06 3.15 5 4.4.7.3 1.24.48 1.67.6.7.23 1.34.2 1.84.12.56-.08 1.7-.7 1.95-1.36.24-.67.24-1.24.17-1.36-.07-.13-.26-.2-.55-.35Z"/><path d="M12 2.4A9.6 9.6 0 0 0 3.9 17.4L2.4 21.6l4.3-1.4A9.6 9.6 0 1 0 12 2.4Zm0 1.8a7.8 7.8 0 0 1 6.6 12.03l-.24.38.3 1-1.03-.3-.37.22A7.8 7.8 0 1 1 12 4.2Z"/></svg>`,
+    "arrow-up": `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>`,
+  };
+  return icons[name] || "";
+}
+
+/** Single Contact Owner UI — compact promo on home, full form on contact page. */
+function renderContactOwner() {
+  const mount = document.getElementById("contactOwnerMount");
+  if (!mount) return;
+
+  const compact = mount.dataset.variant === "compact";
+
+  if (compact) {
+    mount.innerHTML = `
+      <section class="contact-promo reveal" aria-labelledby="contactPromoTitle">
+        <div class="contact-promo-inner glass-panel">
+          <div class="contact-promo-copy">
+            <span class="eyebrow">Direct line</span>
+            <h2 id="contactPromoTitle">Message apex directly</h2>
+            <p>Enrollment, scheduling, or partnerships — one form, routed to the owner.</p>
+          </div>
+          <a href="contact.html#contact-owner" class="btn btn-accent btn-lg btn-magnetic">Contact Owner</a>
+        </div>
+      </section>
+    `;
+    return;
+  }
+
+  mount.innerHTML = `
+    <section id="contact-owner" class="contact-owner-section reveal" aria-labelledby="contactOwnerTitle">
+      <div class="contact-owner-ambient" aria-hidden="true"></div>
+      <div class="contact-owner-inner">
+        <header class="contact-owner-head">
+          <span class="eyebrow eyebrow-on-dark">Owner inbox</span>
+          <h1 id="contactOwnerTitle">Contact Owner</h1>
+          <p>Send a message — delivered directly to <strong>apex</strong>. Response within one business day.</p>
+        </header>
+        <div class="contact-owner-form-wrap">
+          <div class="alert" id="ownerContactAlert"></div>
+          <form id="ownerContactForm" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ownerName">Name</label>
+                <input type="text" id="ownerName" name="ownerName" placeholder="Full name" autocomplete="name" />
+                <span class="field-error" data-error-for="ownerName"></span>
+              </div>
+              <div class="form-group">
+                <label for="ownerEmail">Email</label>
+                <input type="email" id="ownerEmail" name="ownerEmail" placeholder="you@example.com" autocomplete="email" />
+                <span class="field-error" data-error-for="ownerEmail"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="ownerMessage">Message</label>
+              <textarea id="ownerMessage" name="ownerMessage" rows="5" placeholder="How can we help?"></textarea>
+              <span class="field-error" data-error-for="ownerMessage"></span>
+            </div>
+            <button type="submit" class="btn btn-contact-owner btn-lg btn-magnetic">
+              Send to apex
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function wireMobileNav() {
+  const toggle = document.getElementById("navToggle");
+  const nav = document.getElementById("mainNav");
+  if (!toggle || !nav) return;
+  toggle.addEventListener("click", () => {
+    const isOpen = nav.classList.toggle("open");
+    toggle.classList.toggle("open", isOpen);
+    toggle.setAttribute("aria-expanded", String(isOpen));
+  });
+  nav.querySelectorAll("a").forEach((a) =>
+    a.addEventListener("click", () => {
+      nav.classList.remove("open");
+      toggle.classList.remove("open");
+      toggle.setAttribute("aria-expanded", "false");
+    })
+  );
+}
+
+function wireStickyHeader() {
+  const header = document.getElementById("siteHeader");
+  if (!header) return;
+  const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 12);
+  document.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+}
+
+function wireScrollTop() {
+  const btn = document.getElementById("scrollTopBtn");
+  if (!btn) return;
+  const onScroll = () => btn.classList.toggle("visible", window.scrollY > 500);
+  document.addEventListener("scroll", onScroll, { passive: true });
+  btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  onScroll();
+}
+
+async function initLayout() {
+  // Reveal the page first — if anything below throws, the user still sees
+  // content instead of a permanently blank screen.
+  document.body.classList.add("loaded");
+  try {
+    if (typeof ApexDB !== "undefined") {
+      await ApexDB.seedIfEmpty();
+    }
+    renderHeader();
+    renderContactOwner();
+    await renderFooter();
+    wireMobileNav();
+    wireStickyHeader();
+    if (typeof wireMagneticButtons === "function") wireMagneticButtons();
+  } catch (err) {
+    console.error("Error initializing page layout:", err);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initLayout);

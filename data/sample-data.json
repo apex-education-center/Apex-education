@@ -1,0 +1,236 @@
+{
+  "siteInfo": {
+    "name": "Apex Education Center",
+    "tagline": "Private tutoring, elevated.",
+    "phone": "+961 78 984 905",
+    "email": "apex2025.edu@gmail.com",
+    "whatsapp": "96178984905",
+    "address": "Beirut, Lebanon",
+    "mapEmbed": "https://www.google.com/maps?q=Beirut,Lebanon&output=embed",
+    "brochureUrl": "#",
+    "social": {
+      "facebook": "https://www.facebook.com/share/1BXt6aCux2/",
+      "instagram": "https://www.instagram.com/apex_education_center",
+      "twitter": ""
+    },
+    "homepage": {
+      "heroTitle": "The summit of personal instruction.",
+      "heroSubtitle": "Apex pairs students in Beirut and beyond with vetted instructors across mathematics, physics, chemistry and literature — online or in person, on your schedule.",
+      "aboutSummary": "We don't just teach — we ignite curiosity. Students bring theory to life through hands-on experiments, personal attention, and instructors who care about real understanding, not just grades."
+    }
+  },
+  "stats": {
+    "students": 1240,
+    "courses": 26,
+    "instructors": 18,
+    "years": 8
+  },
+  "categories": [
+    { "id": "cat-math", "name": "Mathematics", "icon": "calculator" },
+    { "id": "cat-phys", "name": "Physics", "icon": "atom" },
+    { "id": "cat-chem", "name": "Chemistry", "icon": "flask" },
+    { "id": "cat-bio", "name": "Biology", "icon": "leaf" },
+    { "id": "cat-lit", "name": "Literature", "icon": "book" },
+    { "id": "cat-lang", "name": "Languages", "icon": "globe" }
+  ],
+  "instructors": [
+    {
+      "id": "instr-1",
+      "name": "Dr. Layla Haddad",
+      "subject": "Mathematics",
+      "email": "layla.haddad@example.com",
+      "experience": "12 years",
+      "bio": "Former university lecturer specializing in calculus and exam preparation. Believes every student can love math with the right approach.",
+      "photo": ""
+    },
+    {
+      "id": "instr-2",
+      "name": "Karim Fares",
+      "subject": "Physics",
+      "email": "karim.fares@example.com",
+      "experience": "9 years",
+      "bio": "Hands-on physics tutor focused on experiment-driven learning and real-world intuition over memorization.",
+      "photo": ""
+    },
+    {
+      "id": "instr-3",
+      "name": "Nour Aoun",
+      "subject": "Chemistry",
+      "email": "nour.aoun@example.com",
+      "experience": "7 years",
+      "bio": "Specializes in organic chemistry and lab technique for high schoolers heading into pre-med tracks.",
+      "photo": ""
+    },
+    {
+      "id": "instr-4",
+      "name": "Elie Sarkis",
+      "subject": "Mathematics",
+      "email": "elie.sarkis@example.com",
+      "experience": "15 years",
+      "bio": "Full-week tutor covering algebra through advanced calculus, known for patient, structured explanations.",
+      "photo": ""
+    },
+    {
+      "id": "instr-5",
+      "name": "Maya Choueiri",
+      "subject": "Literature",
+      "email": "maya.choueiri@example.com",
+      "experience": "10 years",
+      "bio": "Passionate about close reading and essay craft, with a focus on both Arabic and English literature.",
+      "photo": ""
+    },
+    {
+      "id": "instr-6",
+      "name": "Tarek Younes",
+      "subject": "Biology",
+      "email": "tarek.younes@example.com",
+      "experience": "6 years",
+      "bio": "Molecular biology graduate who makes cell biology and genetics click through analogy and visualization.",
+      "photo": ""
+    }
+  ],
+  "courses": [
+    {
+      "id": "course-1",
+      "title": "Calculus Mastery",
+      "category": "cat-math",
+      "instructorId": "instr-1",
+      "level": "Advanced",
+      "mode": "Online",
+      "price": 45,
+      "duration": "10 weeks",
+      "image": "",
+      "shortDesc": "Build true fluency in limits, derivatives, and integrals for exam success.",
+      "fullDesc": "This course takes students from foundational limits through advanced integration techniques, with weekly problem sets modeled on real exam papers. Ideal for students preparing for official baccalaureate or SAT-level math.",
+      "syllabus": ["Limits & continuity", "Derivatives & applications", "Integration techniques", "Series & sequences", "Exam-style practice"]
+    },
+    {
+      "id": "course-2",
+      "title": "Physics: Mechanics & Motion",
+      "category": "cat-phys",
+      "instructorId": "instr-2",
+      "level": "Intermediate",
+      "mode": "Présentiel",
+      "price": 40,
+      "duration": "8 weeks",
+      "image": "",
+      "shortDesc": "Hands-on experiments in force, motion, and energy conservation.",
+      "fullDesc": "A lab-driven course covering kinematics, Newton's laws, and energy conservation, with in-person experiments that turn abstract formulas into physical intuition.",
+      "syllabus": ["Kinematics", "Newton's laws", "Work & energy", "Momentum", "Lab practicum"]
+    },
+    {
+      "id": "course-3",
+      "title": "Organic Chemistry Foundations",
+      "category": "cat-chem",
+      "instructorId": "instr-3",
+      "level": "Intermediate",
+      "mode": "Online",
+      "price": 38,
+      "duration": "9 weeks",
+      "image": "",
+      "shortDesc": "Master reaction mechanisms and functional groups from the ground up.",
+      "fullDesc": "Covers nomenclature, functional groups, and core reaction mechanisms, with visual mechanism-mapping techniques that make organic chemistry far less intimidating.",
+      "syllabus": ["Nomenclature", "Functional groups", "Reaction mechanisms", "Stereochemistry", "Lab safety & technique"]
+    },
+    {
+      "id": "course-4",
+      "title": "Full-Track Algebra to Calculus",
+      "category": "cat-math",
+      "instructorId": "instr-4",
+      "level": "Beginner to Advanced",
+      "mode": "Présentiel",
+      "price": 50,
+      "duration": "16 weeks",
+      "image": "",
+      "shortDesc": "A complete academic-year math track, from algebra fundamentals to calculus.",
+      "fullDesc": "Our most comprehensive math track — ideal for students who want structured, full-year progress with one consistent instructor from algebra basics through calculus readiness.",
+      "syllabus": ["Algebra fundamentals", "Functions & graphs", "Trigonometry", "Pre-calculus", "Calculus introduction"]
+    },
+    {
+      "id": "course-5",
+      "title": "Literary Analysis & Essay Craft",
+      "category": "cat-lit",
+      "instructorId": "instr-5",
+      "level": "Intermediate",
+      "mode": "Online",
+      "price": 35,
+      "duration": "8 weeks",
+      "image": "",
+      "shortDesc": "Sharpen close-reading skills and structured argumentative writing.",
+      "fullDesc": "Students read closely, argue persuasively, and write essays that hold together — this course pairs classic and contemporary texts with rigorous writing practice.",
+      "syllabus": ["Close reading technique", "Thesis development", "Structuring arguments", "Editing & revision", "Timed essay practice"]
+    },
+    {
+      "id": "course-6",
+      "title": "Cell Biology & Genetics",
+      "category": "cat-bio",
+      "instructorId": "instr-6",
+      "level": "Intermediate",
+      "mode": "Online",
+      "price": 36,
+      "duration": "8 weeks",
+      "image": "",
+      "shortDesc": "Understand cell structure, function, and the fundamentals of genetics.",
+      "fullDesc": "From cell membranes to Mendelian genetics, this course builds a strong conceptual foundation using diagrams, analogy, and real case studies.",
+      "syllabus": ["Cell structure", "Cellular respiration", "DNA & replication", "Mendelian genetics", "Modern genetic technology"]
+    }
+  ],
+  "schedule": [
+    { "id": "sched-1", "courseId": "course-1", "instructorId": "instr-1", "day": "Monday", "time": "16:00 - 17:30" },
+    { "id": "sched-2", "courseId": "course-2", "instructorId": "instr-2", "day": "Tuesday", "time": "14:00 - 15:30" },
+    { "id": "sched-3", "courseId": "course-3", "instructorId": "instr-3", "day": "Wednesday", "time": "17:00 - 18:30" },
+    { "id": "sched-4", "courseId": "course-4", "instructorId": "instr-4", "day": "Monday", "time": "10:00 - 11:30" },
+    { "id": "sched-5", "courseId": "course-4", "instructorId": "instr-4", "day": "Wednesday", "time": "10:00 - 11:30" },
+    { "id": "sched-6", "courseId": "course-4", "instructorId": "instr-4", "day": "Friday", "time": "10:00 - 11:30" },
+    { "id": "sched-7", "courseId": "course-5", "instructorId": "instr-5", "day": "Tuesday", "time": "16:30 - 18:00" },
+    { "id": "sched-8", "courseId": "course-6", "instructorId": "instr-6", "day": "Thursday", "time": "15:00 - 16:30" }
+  ],
+  "announcements": [
+    {
+      "id": "ann-1",
+      "title": "Fall Term Registration Now Open",
+      "message": "Secure your spot in our most popular tracks before seats fill up.",
+      "date": "2026-06-20"
+    },
+    {
+      "id": "ann-2",
+      "title": "New Chemistry Lab Sessions",
+      "message": "In-person lab practicum now available for Organic Chemistry Foundations.",
+      "date": "2026-06-15"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "test-1",
+      "name": "Sarah K.",
+      "rating": 5,
+      "comment": "My daughter's confidence in math completely turned around after two months with Dr. Haddad. Worth every session.",
+      "date": "2026-05-12",
+      "approved": true
+    },
+    {
+      "id": "test-2",
+      "name": "Michel A.",
+      "rating": 5,
+      "comment": "The physics lab sessions made concepts click in a way textbooks never did. Highly recommend Apex.",
+      "date": "2026-05-02",
+      "approved": true
+    },
+    {
+      "id": "test-3",
+      "name": "Rania H.",
+      "rating": 4,
+      "comment": "Great instructors and flexible scheduling. Booking sessions online is very convenient.",
+      "date": "2026-04-18",
+      "approved": true
+    }
+  ],
+  "faqs": [
+    { "id": "faq-1", "question": "How do I book a session with an instructor?", "answer": "Visit the Instructors or Courses page, choose your instructor or course, and submit the registration form. We'll confirm your session by email or WhatsApp within 24 hours." },
+    { "id": "faq-2", "question": "Do you offer both online and in-person sessions?", "answer": "Yes — each instructor lists their teaching mode (Online or Présentiel) on their profile and on each course page, and many offer both." },
+    { "id": "faq-3", "question": "What age groups do you teach?", "answer": "We work primarily with middle school through university-prep students, with some instructors also offering adult learning support." },
+    { "id": "faq-4", "question": "Can I cancel or reschedule a session?", "answer": "Yes, contact us at least 24 hours in advance via WhatsApp or email and we'll help you reschedule." },
+    { "id": "faq-5", "question": "How is pricing determined?", "answer": "Each course lists an hourly rate set by the instructor based on subject and level. Full-track programs offer better per-session value." }
+  ],
+  "registrations": []
+}
