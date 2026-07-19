@@ -1,0 +1,528 @@
+/* ============================================================
+   APEX DARK CINEMA — seamless night UI across every public page
+   One continuous dark surface. No light/dark splits inside a tab.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
+:root {
+  --cinema-void: #060d10;
+  --cinema-deep: #0a1418;
+  --cinema-mid: #0e1c20;
+  --depth-1: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --depth-2: 0 12px 32px rgba(0, 0, 0, 0.4);
+  --depth-3: 0 28px 64px rgba(0, 0, 0, 0.5);
+  --depth-float: 0 28px 64px rgba(0, 0, 0, 0.45), 0 0 48px rgba(46, 196, 182, 0.08);
+  --perspective: 1200px;
+}
+
+body.apex-cinema {
+  background: var(--cinema-void);
+  color: var(--text);
+  position: relative;
+}
+
+/* Subtle grain only — no heavy vignette that muddies consistency */
+body.apex-cinema::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+body.apex-cinema::after { display: none; }
+
+/* Mouse spotlight */
+.cinema-spotlight {
+  position: fixed;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 35;
+  background: radial-gradient(circle, rgba(46, 196, 182, 0.1), transparent 70%);
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: left, top;
+}
+body.apex-cinema:hover .cinema-spotlight { opacity: 1; }
+@media (hover: none) {
+  .cinema-spotlight { display: none !important; }
+}
+
+/* ---------- Page hero — same void as page body ---------- */
+.page-hero-cinema {
+  position: relative;
+  overflow: hidden;
+  padding: 128px 0 56px;
+  min-height: auto;
+  background: transparent;
+  text-align: left;
+  isolation: isolate;
+}
+.page-hero-cinema::before { display: none; }
+.page-hero-cinema::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(46, 196, 182, 0.25), transparent);
+  z-index: 3;
+}
+
+.ph-layers {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.ph-aurora {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(ellipse 50% 45% at 20% 30%, rgba(46, 196, 182, 0.18), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 85% 20%, rgba(245, 185, 66, 0.08), transparent 50%),
+    radial-gradient(ellipse 45% 40% at 60% 90%, rgba(13, 148, 136, 0.1), transparent 55%);
+  animation: cinemaAurora 22s ease-in-out infinite alternate;
+}
+@keyframes cinemaAurora {
+  from { transform: translate3d(-2%, 0, 0) scale(1.02); }
+  to { transform: translate3d(3%, 2%, 0) scale(1.08); }
+}
+.ph-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 70% at 40% 50%, #000, transparent 75%);
+  opacity: 0.6;
+}
+.ph-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+  animation: cinemaFloat 14s ease-in-out infinite;
+}
+.ph-orb-a {
+  width: 160px; height: 160px;
+  top: 18%; right: 12%;
+  background: radial-gradient(circle, rgba(46, 196, 182, 0.28), transparent 70%);
+  animation-delay: -3s;
+}
+.ph-orb-b {
+  width: 100px; height: 100px;
+  bottom: 20%; left: 8%;
+  background: radial-gradient(circle, rgba(255, 107, 84, 0.18), transparent 70%);
+  animation-delay: -7s;
+}
+@keyframes cinemaFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(12px, -18px, 0); }
+}
+.ph-watermark {
+  position: absolute;
+  right: -2%;
+  bottom: -6%;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(4.5rem, 14vw, 11rem);
+  letter-spacing: -0.06em;
+  line-height: 0.75;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.05);
+  user-select: none;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+.ph-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.5;
+}
+.ph-particles span {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(94, 234, 212, 0.5);
+  animation: particleRise linear infinite;
+}
+.ph-particles span:nth-child(1) { left: 12%; bottom: 0; animation-duration: 14s; }
+.ph-particles span:nth-child(2) { left: 28%; bottom: 0; animation-duration: 18s; animation-delay: -3s; }
+.ph-particles span:nth-child(3) { left: 45%; bottom: 0; animation-duration: 16s; animation-delay: -6s; }
+.ph-particles span:nth-child(4) { left: 62%; bottom: 0; animation-duration: 20s; animation-delay: -2s; }
+.ph-particles span:nth-child(5) { left: 78%; bottom: 0; animation-duration: 15s; animation-delay: -8s; }
+.ph-particles span:nth-child(6) { left: 90%; bottom: 0; animation-duration: 17s; animation-delay: -4s; }
+@keyframes particleRise {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-60vh); opacity: 0; }
+}
+
+.ph-content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+}
+.page-hero-cinema .eyebrow {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.page-hero-cinema .eyebrow::before {
+  background: var(--teal-bright);
+  box-shadow: 0 0 10px var(--teal-glow);
+}
+.page-hero-cinema h1 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+  color: #fff;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+.page-hero-cinema p {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 1.05rem;
+  max-width: 42ch;
+  margin: 16px 0 0;
+  line-height: 1.7;
+}
+.page-hero-cinema a { color: var(--teal-bright); }
+
+/* Soft scene accents — same dark base, slight hue shift only */
+.page-hero-cinema[data-scene="courses"] .ph-aurora {
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 30%, rgba(46, 196, 182, 0.22), transparent 55%),
+    radial-gradient(ellipse 35% 30% at 80% 60%, rgba(124, 108, 240, 0.08), transparent 50%);
+}
+.page-hero-cinema[data-scene="instructors"] .ph-aurora {
+  background:
+    radial-gradient(ellipse 45% 40% at 70% 25%, rgba(245, 185, 66, 0.12), transparent 50%),
+    radial-gradient(ellipse 40% 35% at 20% 55%, rgba(46, 196, 182, 0.16), transparent 55%);
+}
+.page-hero-cinema[data-scene="schedule"] .ph-aurora {
+  background:
+    radial-gradient(ellipse 50% 40% at 50% 20%, rgba(46, 196, 182, 0.16), transparent 55%),
+    radial-gradient(ellipse 35% 35% at 15% 75%, rgba(255, 107, 84, 0.08), transparent 50%);
+}
+.page-hero-cinema[data-scene="about"] .ph-aurora {
+  background:
+    radial-gradient(ellipse 50% 45% at 30% 40%, rgba(46, 196, 182, 0.2), transparent 55%);
+}
+.page-hero-cinema[data-scene="registration"] .ph-aurora {
+  background:
+    radial-gradient(ellipse 45% 40% at 75% 30%, rgba(255, 107, 84, 0.14), transparent 50%),
+    radial-gradient(ellipse 40% 35% at 15% 50%, rgba(46, 196, 182, 0.16), transparent 55%);
+}
+.page-hero-cinema[data-scene="contact"] .ph-aurora {
+  background:
+    radial-gradient(ellipse 50% 45% at 55% 40%, rgba(46, 196, 182, 0.2), transparent 55%);
+}
+.page-hero-cinema[data-scene="faq"] .ph-aurora {
+  background:
+    radial-gradient(ellipse 45% 40% at 40% 30%, rgba(94, 234, 212, 0.14), transparent 55%);
+}
+.page-hero-cinema[data-scene="feedback"] .ph-aurora {
+  background:
+    radial-gradient(ellipse 45% 40% at 25% 40%, rgba(245, 185, 66, 0.12), transparent 50%),
+    radial-gradient(ellipse 40% 35% at 80% 55%, rgba(46, 196, 182, 0.14), transparent 55%);
+}
+
+/* ---------- Content stage — same void, no white sheet ---------- */
+.cinema-stage {
+  position: relative;
+  margin-top: 0;
+  z-index: 2;
+  padding: 8px 0 64px;
+  background: transparent;
+}
+.cinema-stage > .container {
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  padding: 0 28px 32px;
+  box-shadow: none;
+}
+
+/* ---------- Dark elevated cards ---------- */
+body.apex-cinema .course-card,
+body.apex-cinema .instructor-card,
+body.apex-cinema .testimonial-card,
+body.apex-cinema .form-card,
+body.apex-cinema .glass-panel,
+body.apex-cinema .value-panel,
+body.apex-cinema .facts-panel,
+body.apex-cinema .contact-info-panel,
+body.apex-cinema .map-shell {
+  background: rgba(14, 28, 32, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--depth-2);
+  color: var(--text);
+}
+body.apex-cinema .course-card:hover,
+body.apex-cinema .instructor-card:hover {
+  border-color: rgba(46, 196, 182, 0.28);
+  box-shadow: var(--depth-float);
+}
+body.apex-cinema .course-body h3,
+body.apex-cinema .instructor-card h3,
+body.apex-cinema .form-card h2,
+body.apex-cinema .form-card h3,
+body.apex-cinema .glass-panel h2,
+body.apex-cinema .glass-panel h3,
+body.apex-cinema .facts-title {
+  color: #fff;
+}
+
+/* Forms */
+body.apex-cinema .form-card {
+  background: rgba(12, 22, 26, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+body.apex-cinema input,
+body.apex-cinema textarea,
+body.apex-cinema select,
+body.apex-cinema .search-bar input {
+  background: rgba(6, 13, 16, 0.8) !important;
+  color: var(--text) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+body.apex-cinema input::placeholder,
+body.apex-cinema textarea::placeholder {
+  color: var(--text-faint);
+}
+body.apex-cinema input:focus,
+body.apex-cinema textarea:focus,
+body.apex-cinema select:focus {
+  border-color: var(--teal) !important;
+  box-shadow: 0 0 0 4px rgba(46, 196, 182, 0.16);
+}
+body.apex-cinema label { color: rgba(255, 255, 255, 0.75); }
+
+/* Buttons */
+body.apex-cinema .btn-accent {
+  box-shadow: 0 8px 28px rgba(255, 107, 84, 0.35);
+}
+body.apex-cinema .btn-primary {
+  background: var(--teal);
+  color: #031014;
+  box-shadow: 0 8px 24px rgba(46, 196, 182, 0.25);
+}
+body.apex-cinema .btn-outline {
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Section titles */
+body.apex-cinema .section-head h2,
+body.apex-cinema .showcase-head h2,
+body.apex-cinema .section-alt h2 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: -0.025em;
+}
+body.apex-cinema .section-alt {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Filters */
+body.apex-cinema .filter-btn {
+  background: rgba(14, 28, 32, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+body.apex-cinema .filter-btn:hover {
+  border-color: rgba(46, 196, 182, 0.35);
+  color: #fff;
+}
+body.apex-cinema .filter-btn.active {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #031014;
+  box-shadow: 0 8px 24px rgba(46, 196, 182, 0.25);
+}
+
+/* Schedule */
+body.apex-cinema .schedule-table {
+  background: rgba(14, 28, 32, 0.9);
+  box-shadow: var(--depth-2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transform: none;
+}
+body.apex-cinema .schedule-table th {
+  background: rgba(6, 13, 16, 0.95);
+  color: var(--text-muted);
+}
+body.apex-cinema .schedule-table td {
+  color: var(--text);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+body.apex-cinema .schedule-table tr:hover td {
+  background: rgba(46, 196, 182, 0.06);
+}
+
+/* FAQ */
+body.apex-cinema .accordion-item {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  margin-bottom: 10px;
+  background: rgba(14, 28, 32, 0.75);
+  overflow: hidden;
+}
+body.apex-cinema .accordion-trigger {
+  color: #fff;
+}
+body.apex-cinema .accordion-trigger:hover { color: var(--teal-bright); }
+body.apex-cinema .accordion-trigger .plus {
+  background: rgba(46, 196, 182, 0.12);
+  color: var(--teal-bright);
+}
+body.apex-cinema .accordion-panel { color: var(--text-muted); }
+
+/* Registration — same dark plane */
+body.apex-cinema .reg-layout {
+  position: relative;
+  z-index: 2;
+  margin-top: 0;
+  padding: 8px 24px 72px;
+  perspective: none;
+}
+body.apex-cinema .reg-aside {
+  transform: none;
+  background: linear-gradient(155deg, #0a1619, #0d2a28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--depth-2);
+}
+body.apex-cinema .reg-form-wrap { transform: none; }
+body.apex-cinema .reg-benefit:hover {
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Contact */
+body.apex-cinema .contact-main,
+body.apex-cinema .contact-layout-section {
+  background: transparent;
+}
+body.apex-cinema .contact-owner-section {
+  background: linear-gradient(158deg, #061416 0%, #0A2828 55%, #0d3d3a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--depth-2);
+}
+body.apex-cinema .contact-info-item a { color: var(--teal-bright); }
+
+/* Footer already dark — keep seamless */
+body.apex-cinema .site-footer {
+  background: #03090c;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+body.apex-cinema .site-footer::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(46, 196, 182, 0.3), transparent);
+}
+
+/* Reveal — subtle, not theatrical 3D flips */
+body.apex-cinema .reveal,
+body.apex-cinema .reveal-stagger {
+  transform: translateY(24px);
+  opacity: 0;
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+body.apex-cinema .reveal.visible,
+body.apex-cinema .reveal-stagger.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Facts / value panels */
+body.apex-cinema .facts-row dt { color: var(--text-faint); }
+body.apex-cinema .facts-row dd { color: var(--text); }
+body.apex-cinema .copy-lead { color: var(--text-muted); }
+
+/* Star ratings on dark */
+body.apex-cinema .star-btn { color: rgba(255, 255, 255, 0.2); }
+
+/* Mobile */
+@media (max-width: 860px) {
+  .page-hero-cinema {
+    padding: 108px 0 36px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .ph-watermark {
+    font-size: clamp(3rem, 18vw, 6rem);
+    opacity: 0.45;
+    right: -4%;
+    bottom: -4%;
+  }
+  .ph-orb { display: none; }
+  .ph-grid { opacity: 0.35; transform: none !important; }
+  .cinema-stage {
+    margin-top: 0;
+    padding-bottom: 48px;
+  }
+  .cinema-stage > .container {
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  body.apex-cinema .reg-layout {
+    padding: 8px 16px 48px;
+    perspective: none;
+  }
+  body.apex-cinema .reg-aside,
+  body.apex-cinema .reg-form-wrap {
+    transform: none !important;
+  }
+  body.apex-cinema .course-card,
+  body.apex-cinema .instructor-card,
+  body.apex-cinema .form-card,
+  body.apex-cinema .glass-panel {
+    transform: none !important;
+  }
+  body.apex-cinema::before { opacity: 0.02; }
+}
+
+@media (max-width: 480px) {
+  .page-hero-cinema h1 { font-size: 2.05rem; }
+  .page-hero-cinema p { font-size: 0.98rem; }
+  .ph-particles { display: none; }
+  .ph-watermark { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ph-aurora, .ph-orb, .ph-particles span { animation: none !important; }
+  body.apex-cinema::before { display: none; }
+  body.apex-cinema .reveal,
+  body.apex-cinema .reveal-stagger {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (hover: none) {
+  body.apex-cinema .course-card:hover,
+  body.apex-cinema .instructor-card:hover {
+    transform: none;
+  }
+}

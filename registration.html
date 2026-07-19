@@ -6,40 +6,82 @@
   <link rel="icon" href="assets/images/logo.png" type="image/png" />
   <title>Register — Apex Education Center</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/cinematic.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 </head>
-<body data-page="registration">
+<body data-page="registration" class="apex-cinema">
   <div class="page-loader"><svg class="loader-mark" viewBox="0 0 32 32"><path d="M16 4 L28 26 L4 26 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12 L23 26 L9 26 Z" fill="currentColor"/></svg></div>
-
   <div id="site-header"></div>
-
   <main>
-    <section class="page-hero">
-      <div class="container">
+    <section class="page-hero page-hero-cinema" data-scene="registration">
+      <div class="ph-layers" aria-hidden="true">
+        <div class="ph-aurora"></div>
+        <div class="ph-grid"></div>
+        <div class="ph-orb ph-orb-a"></div>
+        <div class="ph-orb ph-orb-b"></div>
+        <div class="ph-particles"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="ph-watermark">JOIN</div>
+      </div>
+      <div class="container ph-content">
         <span class="eyebrow">Get Started</span>
         <h1>Register for a session</h1>
-        <p>Fill out the form below and we'll confirm your session within 24 hours.</p>
+        <p>Tell us a bit about yourself — we'll confirm within 24 hours.</p>
       </div>
     </section>
 
-    <section>
-      <div class="container" style="max-width:640px;">
+    <div class="reg-layout">
+      <aside class="reg-aside reveal">
+        <span class="eyebrow eyebrow-on-dark">Why register</span>
+        <h2>Your ascent starts here</h2>
+        <p>Join families who chose Apex for personal attention, flexible scheduling, and instructors who care about real understanding.</p>
+        <div class="reg-benefits">
+          <div class="reg-benefit">
+            <span class="reg-benefit-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+            </span>
+            <div>
+              <h3>Confirmed in 24 hours</h3>
+              <p>We review every request and reply by email or WhatsApp.</p>
+            </div>
+          </div>
+          <div class="reg-benefit">
+            <span class="reg-benefit-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </span>
+            <div>
+              <h3>Flexible scheduling</h3>
+              <p>Online or in person — times that fit your calendar.</p>
+            </div>
+          </div>
+          <div class="reg-benefit">
+            <span class="reg-benefit-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            <div>
+              <h3>Vetted instructors</h3>
+              <p>Matched to your subject, level, and learning goals.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="reg-form-wrap reveal">
         <div class="form-card">
           <div class="alert" id="registrationAlert"></div>
           <form id="registrationForm" novalidate>
             <div class="form-group">
               <label for="studentName">Full Name</label>
-              <input type="text" id="studentName" name="studentName" placeholder="Your full name" />
+              <input type="text" id="studentName" name="studentName" placeholder="Your full name" autocomplete="name" />
               <span class="field-error" data-error-for="studentName"></span>
             </div>
             <div class="form-group">
               <label for="email">Email</label>
-              <input type="email" id="email" name="email" placeholder="you@example.com" />
+              <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
               <span class="field-error" data-error-for="email"></span>
             </div>
             <div class="form-group">
               <label for="phone">Phone (optional)</label>
-              <input type="tel" id="phone" name="phone" placeholder="+961 xx xxx xxx" />
+              <input type="tel" id="phone" name="phone" placeholder="+961 xx xxx xxx" autocomplete="tel" />
               <span class="field-error" data-error-for="phone"></span>
             </div>
             <div class="form-group">
@@ -50,15 +92,13 @@
               <label for="notes">Notes (optional)</label>
               <textarea id="notes" name="notes" rows="3" placeholder="Preferred days, topics to focus on, etc."></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-block btn-lg btn-magnetic">Submit Registration</button>
+            <button type="submit" class="btn btn-accent btn-block btn-lg btn-magnetic">Submit Registration</button>
           </form>
         </div>
       </div>
-    </section>
+    </div>
   </main>
-
   <div id="site-footer"></div>
-
   <script src="js/storage.js"></script>
   <script src="js/components.js"></script>
   <script src="js/validation.js"></script>

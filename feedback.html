@@ -6,23 +6,30 @@
   <link rel="icon" href="assets/images/logo.png" type="image/png" />
   <title>Feedback & Testimonials — Apex Education Center</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/cinematic.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 </head>
-<body data-page="feedback">
+<body data-page="feedback" class="apex-cinema">
   <div class="page-loader"><svg class="loader-mark" viewBox="0 0 32 32"><path d="M16 4 L28 26 L4 26 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12 L23 26 L9 26 Z" fill="currentColor"/></svg></div>
-
   <div id="site-header"></div>
-
   <main>
-    <section class="page-hero">
-      <div class="container">
+    <section class="page-hero page-hero-cinema" data-scene="feedback">
+      <div class="ph-layers" aria-hidden="true">
+        <div class="ph-aurora"></div>
+        <div class="ph-grid"></div>
+        <div class="ph-orb ph-orb-a"></div>
+        <div class="ph-orb ph-orb-b"></div>
+        <div class="ph-particles"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="ph-watermark">VOICES</div>
+      </div>
+      <div class="container ph-content">
         <span class="eyebrow">Testimonials</span>
         <h1>What our students say</h1>
         <p>Real feedback from real families. Share your own experience below.</p>
       </div>
     </section>
 
-    <section>
+    <section class="cinema-stage">
       <div class="container">
         <div class="card-grid" id="allTestimonials"></div>
       </div>
@@ -34,7 +41,7 @@
           <span class="eyebrow">Share Your Experience</span>
           <h2>Leave feedback</h2>
         </div>
-        <div class="form-card">
+        <div class="form-card reveal">
           <div class="alert" id="feedbackAlert"></div>
           <form id="feedbackForm" novalidate>
             <div class="form-group">
@@ -60,9 +67,7 @@
       </div>
     </section>
   </main>
-
   <div id="site-footer"></div>
-
   <script src="js/storage.js"></script>
   <script src="js/components.js"></script>
   <script src="js/validation.js"></script>

@@ -6,32 +6,36 @@
   <link rel="icon" href="assets/images/logo.png" type="image/png" />
   <title>Instructors — Apex Education Center</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/cinematic.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 </head>
-<body data-page="instructors">
+<body data-page="instructors" class="apex-cinema">
   <div class="page-loader"><svg class="loader-mark" viewBox="0 0 32 32"><path d="M16 4 L28 26 L4 26 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12 L23 26 L9 26 Z" fill="currentColor"/></svg></div>
-
   <div id="site-header"></div>
-
   <main>
-    <section class="page-hero">
-      <div class="container">
+    <section class="page-hero page-hero-cinema" data-scene="instructors">
+      <div class="ph-layers" aria-hidden="true">
+        <div class="ph-aurora"></div>
+        <div class="ph-grid"></div>
+        <div class="ph-orb ph-orb-a"></div>
+        <div class="ph-orb ph-orb-b"></div>
+        <div class="ph-particles"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="ph-watermark">TEAM</div>
+      </div>
+      <div class="container ph-content">
         <span class="eyebrow">Our Team</span>
         <h1>Meet the instructors</h1>
-        <p>Every instructor at Apex is personally vetted for subject mastery and a genuine gift for teaching.</p>
+        <p>Every instructor is personally vetted for subject mastery and a genuine gift for teaching.</p>
       </div>
     </section>
-
-    <section>
+    <section class="cinema-stage">
       <div class="container">
         <div class="filter-bar" id="subjectFilterBar"></div>
         <div class="card-grid" id="instructorsGrid"></div>
       </div>
     </section>
   </main>
-
   <div id="site-footer"></div>
-
   <script src="js/storage.js"></script>
   <script src="js/components.js"></script>
   <script src="js/main.js"></script>

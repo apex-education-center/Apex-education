@@ -24,8 +24,8 @@ function renderHeader() {
 
   mount.innerHTML = `
     <header class="site-header" id="siteHeader">
-      <div class="container header-inner">
-        <a href="index.html" class="brand">
+      <div class="header-inner">
+        <a href="index.html" class="brand" aria-label="Apex Education Center home">
           <span class="brand-mark" aria-hidden="true">
             <img src="assets/images/logo.png" alt="" />
           </span>
@@ -37,11 +37,14 @@ function renderHeader() {
             ${NAV_LINKS.map(
               (l) => `<li><a href="${l.href}" class="${l.page === current ? "active" : ""}">${l.label}</a></li>`
             ).join("")}
+            <li class="nav-mobile-cta">
+              <a href="registration.html" class="btn btn-accent btn-block">Register</a>
+            </li>
           </ul>
         </nav>
 
         <div class="header-actions">
-          <a href="registration.html" class="btn btn-accent btn-sm btn-magnetic">Register</a>
+          <a href="registration.html" class="btn btn-accent btn-sm btn-magnetic header-register">Register</a>
           <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
             <span></span><span></span><span></span>
           </button>
@@ -193,18 +196,33 @@ function wireMobileNav() {
   const toggle = document.getElementById("navToggle");
   const nav = document.getElementById("mainNav");
   if (!toggle || !nav) return;
+
+  let backdrop = document.getElementById("navBackdrop");
+  if (!backdrop) {
+    backdrop = document.createElement("div");
+    backdrop.id = "navBackdrop";
+    backdrop.className = "nav-backdrop";
+    backdrop.setAttribute("aria-hidden", "true");
+    document.body.appendChild(backdrop);
+  }
+
+  const close = () => {
+    nav.classList.remove("open");
+    toggle.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+    backdrop.classList.remove("open");
+    document.body.style.overflow = "";
+  };
+
   toggle.addEventListener("click", () => {
     const isOpen = nav.classList.toggle("open");
     toggle.classList.toggle("open", isOpen);
     toggle.setAttribute("aria-expanded", String(isOpen));
+    backdrop.classList.toggle("open", isOpen);
+    document.body.style.overflow = isOpen ? "hidden" : "";
   });
-  nav.querySelectorAll("a").forEach((a) =>
-    a.addEventListener("click", () => {
-      nav.classList.remove("open");
-      toggle.classList.remove("open");
-      toggle.setAttribute("aria-expanded", "false");
-    })
-  );
+  backdrop.addEventListener("click", close);
+  nav.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
 }
 
 function wireStickyHeader() {

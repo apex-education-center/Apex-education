@@ -143,6 +143,22 @@ function initHeroGlow() {
   requestAnimationFrame(loop);
 }
 
+/* ---------- Hero brand parallax ---------- */
+function initHeroBrandParallax() {
+  const mark = document.getElementById("heroBrandMark");
+  const hero = document.querySelector(".hero-cinematic");
+  if (!mark || !hero) return;
+  const onScroll = () => {
+    const rect = hero.getBoundingClientRect();
+    if (rect.bottom < 0) return;
+    const progress = Math.min(1, Math.max(0, -rect.top / Math.max(rect.height, 1)));
+    mark.style.transform = `translateX(-50%) translateY(${progress * 40}px)`;
+    mark.style.opacity = String(1 - progress * 0.55);
+  };
+  document.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+}
+
 /* ---------- Scroll cue ---------- */
 function initScrollCue() {
   const btn = document.getElementById("scrollCue");
@@ -154,16 +170,24 @@ function initScrollCue() {
   });
 }
 
-/* ---------- Tilt-on-hover for cards (subtle 3D response to cursor) ---------- */
+/* ---------- Tilt-on-hover for cards (cinematic 3D on apex-cinema pages) ---------- */
 function wireTiltCards(selector) {
+  if (window.matchMedia("(hover: none)").matches) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cinema = document.body.classList.contains("apex-cinema");
+  const rx = cinema ? 10 : 6;
+  const ry = cinema ? 12 : 8;
+  const lift = cinema ? 12 : 8;
+  const z = cinema ? 18 : 0;
   document.querySelectorAll(`${selector}:not([data-tilt-wired])`).forEach((card) => {
+    if (card.closest(".contact-promo-inner")) return;
     card.dataset.tiltWired = "true";
     card.style.transformStyle = "preserve-3d";
     card.addEventListener("pointermove", (e) => {
       const rect = card.getBoundingClientRect();
       const px = (e.clientX - rect.left) / rect.width - 0.5;
       const py = (e.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = `perspective(800px) rotateX(${-py * 6}deg) rotateY(${px * 8}deg) translateY(-8px)`;
+      card.style.transform = `perspective(1000px) rotateX(${-py * rx}deg) rotateY(${px * ry}deg) translateY(-${lift}px) translateZ(${z}px)`;
     });
     card.addEventListener("pointerleave", () => {
       card.style.transform = "";
@@ -173,6 +197,7 @@ function wireTiltCards(selector) {
 
 /* ---------- Magnetic buttons ---------- */
 function wireMagneticButtons() {
+  if (window.matchMedia("(hover: none)").matches) return;
   document.querySelectorAll(".btn-magnetic:not([data-magnetic-wired])").forEach((btn) => {
     btn.dataset.magneticWired = "true";
     btn.addEventListener("pointermove", (e) => {
@@ -185,6 +210,107 @@ function wireMagneticButtons() {
       btn.style.transform = "";
     });
   });
+}
+
+/* ---------- Cinematic engine: spotlight + 3D tilt + watermark parallax ---------- */
+function initCinemaEngine() {
+  if (!document.body.classList.contains("apex-cinema")) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  // Mouse spotlight
+  if (window.matchMedia("(hover: hover)").matches) {
+    let spot = document.querySelector(".cinema-spotlight");
+    if (!spot) {
+      spot = document.createElement("div");
+      spot.className = "cinema-spotlight";
+      document.body.appendChild(spot);
+    }
+    let sx = window.innerWidth / 2, sy = window.innerHeight / 2;
+    let cx = sx, cy = sy;
+    document.addEventListener("pointermove", (e) => {
+      sx = e.clientX;
+      sy = e.clientY;
+    }, { passive: true });
+    (function spotLoop() {
+      cx += (sx - cx) * 0.08;
+      cy += (sy - cy) * 0.08;
+      spot.style.left = cx + "px";
+      spot.style.top = cy + "px";
+      requestAnimationFrame(spotLoop);
+    })();
+  }
+
+  // Stronger 3D tilt — desktop hover only (skip on touch / narrow)
+  if (
+    window.matchMedia("(hover: hover)").matches &&
+    window.matchMedia("(min-width: 861px)").matches
+  ) {
+    wireTiltCards(".course-card");
+    wireTiltCards(".instructor-card");
+    wireTiltCards(".form-card");
+    wireTiltCards(".glass-panel");
+    wireTiltCards(".testimonial-card");
+
+    const mounts = document.querySelectorAll("#coursesGrid, #instructorsGrid, #faqMount, #scheduleMount, #featuredCourses, #instructorPreview, #testimonialPreview");
+    if (mounts.length && typeof MutationObserver !== "undefined") {
+      const mo = new MutationObserver(() => {
+        wireTiltCards(".course-card");
+        wireTiltCards(".instructor-card");
+        wireTiltCards(".testimonial-card");
+      });
+      mounts.forEach((m) => mo.observe(m, { childList: true, subtree: true }));
+    }
+  }
+
+  // Watermark parallax on scroll (leave aurora to CSS animation)
+  const marks = document.querySelectorAll(".ph-watermark, #heroBrandMark");
+  if (marks.length) {
+    const onScroll = () => {
+      marks.forEach((el) => {
+        const parent = el.closest(".page-hero-cinema, .hero-cinematic") || el.parentElement;
+        if (!parent) return;
+        const rect = parent.getBoundingClientRect();
+        const progress = Math.min(1, Math.max(0, -rect.top / Math.max(rect.height, 1)));
+        const isHeroBrand = el.id === "heroBrandMark";
+        if (isHeroBrand) {
+          el.style.transform = `translateX(-50%) translateY(${progress * 48}px)`;
+          el.style.opacity = String(1 - progress * 0.55);
+        } else {
+          const scene = el.closest("[data-scene]");
+          const sceneName = scene ? scene.dataset.scene : "";
+          if (sceneName === "about") {
+            el.style.transform = `translateX(-50%) translate3d(0, ${progress * -50}px, -100px) rotateX(${25 - progress * 8}deg)`;
+          } else if (sceneName === "feedback") {
+            el.style.transform = `translate3d(${progress * 40}px, ${progress * -30}px, -60px) rotateY(12deg) rotateZ(-4deg)`;
+          } else {
+            el.style.transform = `translate3d(${progress * 56}px, ${progress * -40}px, -80px) rotateY(-10deg) scale(${1 + progress * 0.06})`;
+          }
+        }
+      });
+    };
+    document.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
+  // Pointer parallax on hero orbs — desktop only
+  if (
+    window.matchMedia("(hover: hover)").matches &&
+    window.matchMedia("(min-width: 861px)").matches
+  ) {
+    document.querySelectorAll(".page-hero-cinema").forEach((hero) => {
+      const orbs = hero.querySelectorAll(".ph-orb");
+      if (!orbs.length) return;
+      hero.addEventListener("pointermove", (e) => {
+        const rect = hero.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width - 0.5;
+        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        orbs.forEach((orb, i) => {
+          const depth = (i + 1) * 18;
+          orb.style.transform = `translate3d(${px * depth}px, ${py * depth}px, ${40 + i * 20}px)`;
+        });
+      });
+    });
+  }
 }
 
 /* ---------- Animated counters ---------- */
@@ -225,20 +351,24 @@ function initNewsletter() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const input = form.elements["newsletterEmail"];
-    const msg = form.querySelector(".newsletter-msg");
+    const msg =
+      form.querySelector(".newsletter-msg") ||
+      form.parentElement?.querySelector(".newsletter-msg") ||
+      document.querySelector(".finale .newsletter-msg");
+    if (!msg) return;
     if (!input.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
       msg.textContent = "Enter a valid email address.";
-      msg.style.color = "var(--color-coral)";
+      msg.style.color = "var(--coral)";
       return;
     }
     try {
       await ApexDB.subscribeNewsletter(input.value.trim());
       msg.textContent = "Subscribed! Watch your inbox for updates.";
-      msg.style.color = "var(--color-teal)";
+      msg.style.color = "var(--teal-bright, var(--teal))";
       form.reset();
     } catch (err) {
       msg.textContent = err.message || "Something went wrong. Please try again.";
-      msg.style.color = "var(--color-coral)";
+      msg.style.color = "var(--coral)";
     }
   });
 }
@@ -506,16 +636,18 @@ async function renderHomepage() {
     if (el) el.dataset.target = val;
   });
 
-  // Categories
+  // Categories — duplicate for infinite marquee when present
   const catRow = document.getElementById("categoryRow");
   if (catRow) {
-    catRow.innerHTML = categories
+    const chips = categories
       .map(
         (c) => `<a href="courses.html?category=${c.id}" class="category-chip">
           <span class="chip-icon">${categoryIconSvg(c.icon)}</span> ${c.name}
         </a>`
       )
       .join("");
+    const inMarquee = catRow.closest(".marquee");
+    catRow.innerHTML = inMarquee ? chips + chips : chips;
   }
 
   // Featured courses (first 3)
@@ -566,7 +698,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   await initFaqPage();
   initNewsletter();
   initHeroGlow();
+  initHeroBrandParallax();
   initScrollCue();
+  initCinemaEngine();
   wireMagneticButtons();
   if (document.body.dataset.page !== "home") initScrollReveal();
 });

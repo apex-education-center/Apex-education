@@ -6,50 +6,48 @@
   <link rel="icon" href="assets/images/logo.png" type="image/png" />
   <title>Courses — Apex Education Center</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/cinematic.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 </head>
-<body data-page="courses">
+<body data-page="courses" class="apex-cinema">
   <div class="page-loader"><svg class="loader-mark" viewBox="0 0 32 32"><path d="M16 4 L28 26 L4 26 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12 L23 26 L9 26 Z" fill="currentColor"/></svg></div>
-
   <div id="site-header"></div>
-
   <main>
-    <section class="page-hero">
-      <div class="container">
-        <span class="eyebrow">Our Courses</span>
+    <section class="page-hero page-hero-cinema" data-scene="courses">
+      <div class="ph-layers" aria-hidden="true">
+        <div class="ph-aurora"></div>
+        <div class="ph-grid"></div>
+        <div class="ph-orb ph-orb-a"></div>
+        <div class="ph-orb ph-orb-b"></div>
+        <div class="ph-particles"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="ph-watermark">COURSES</div>
+      </div>
+      <div class="container ph-content">
+        <span class="eyebrow">Catalog</span>
         <h1>Find the right course</h1>
-        <p>Search or filter by subject and teaching mode to find a course that fits.</p>
+        <p>Search or filter by subject and teaching mode — every course is built for real understanding.</p>
       </div>
     </section>
-
-    <section>
+    <section class="cinema-stage">
       <div class="container">
         <div class="search-bar">
           <input type="text" id="courseSearch" placeholder="Search courses…" aria-label="Search courses" />
         </div>
-
         <div class="filter-bar" id="categoryFilterBar"></div>
         <div class="filter-bar" id="modeFilterBar">
           <button class="filter-btn active" data-mode="all">All Modes</button>
           <button class="filter-btn" data-mode="online">Online</button>
           <button class="filter-btn" data-mode="présentiel">Présentiel</button>
         </div>
-
-        <p id="resultCount" style="text-align:center;color:var(--color-text-faint);font-size:0.88rem;margin-bottom:24px;"></p>
-
+        <p id="resultCount" style="text-align:left;color:var(--text-faint);font-size:0.88rem;margin-bottom:24px;"></p>
         <div class="card-grid" id="coursesGrid"></div>
-
         <div class="empty-state" id="coursesEmpty" style="display:none;">
-          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
-          <h3>No courses match your search</h3>
-          <p>Try a different keyword or clear your filters.</p>
+          <p>No courses match your filters. Try clearing a filter or searching a different term.</p>
         </div>
       </div>
     </section>
   </main>
-
   <div id="site-footer"></div>
-
   <script src="js/storage.js"></script>
   <script src="js/components.js"></script>
   <script src="js/main.js"></script>
