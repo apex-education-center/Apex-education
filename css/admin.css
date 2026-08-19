@@ -129,6 +129,19 @@ body[data-page="dashboard"] {
 .modal-close { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); }
 .modal-close:hover { background: var(--color-coral-light); color: var(--color-coral); }
 
+.checkbox-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.checkbox-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px; border-radius: var(--radius-full, 999px);
+  background: var(--color-surface-alt); border: 1px solid var(--color-border);
+  font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted);
+  cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.checkbox-pill:has(input:checked) {
+  background: rgba(13,148,136,0.12); border-color: var(--color-primary); color: var(--color-primary-dark);
+}
+.checkbox-pill input { accent-color: var(--color-primary); width: 15px; height: 15px; }
+
 .image-upload {
   border: 1.5px dashed var(--color-border-strong); border-radius: var(--radius-md); padding: 20px;
   text-align: center; cursor: pointer; transition: border-color 0.2s;

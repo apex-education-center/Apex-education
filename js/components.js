@@ -12,10 +12,91 @@ const NAV_LINKS = [
   { href: "about.html", label: "About", page: "about" },
   { href: "courses.html", label: "Courses", page: "courses" },
   { href: "instructors.html", label: "Instructors", page: "instructors" },
-  { href: "schedule.html", label: "Schedule", page: "schedule" },
   { href: "faq.html", label: "FAQ", page: "faq" },
   { href: "contact.html#contact-owner", label: "Contact Owner", page: "contact" },
 ];
+
+/* ---------- Language / translate switcher ----------
+   Uses Google's free website-translate widget under the hood, but is
+   presented as a small branded dropdown instead of Google's default bar.
+   No API key required. Pierre can add/remove languages by editing
+   TRANSLATE_LANGUAGES below. */
+const TRANSLATE_LANGUAGES = [
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "ar", label: "العربية", flag: "🇱🇧" },
+];
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+  return match ? decodeURIComponent(match[1]) : "";
+}
+
+function setGoogleTranslateCookie(langCode) {
+  // googtrans cookie format: /<from>/<to> ; "" (or "en") means "show original"
+  const value = langCode === "en" ? "/en/en" : `/en/${langCode}`;
+  document.cookie = `googtrans=${value};path=/`;
+  document.cookie = `googtrans=${value};path=/;domain=${window.location.hostname}`;
+}
+
+function initLanguageSwitcher() {
+  const mount = document.getElementById("langSwitcher");
+  if (!mount) return;
+
+  const current = (getCookie("googtrans").split("/")[2] || "en");
+  const currentLang = TRANSLATE_LANGUAGES.find((l) => l.code === current) || TRANSLATE_LANGUAGES[0];
+
+  mount.innerHTML = `
+    <button class="lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false" aria-label="Change language">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3c2.5 2.7 4 6 4 9s-1.5 6.3-4 9c-2.5-2.7-4-6-4-9s1.5-6.3 4-9Z"/></svg>
+      <span id="langBtnLabel">${currentLang.code.toUpperCase()}</span>
+    </button>
+    <div class="lang-menu" id="langMenu" role="menu">
+      ${TRANSLATE_LANGUAGES.map(
+        (l) => `<button class="lang-option ${l.code === currentLang.code ? "active" : ""}" role="menuitem" data-lang="${l.code}">
+          <span class="lang-flag">${l.flag}</span> ${l.label}
+        </button>`
+      ).join("")}
+    </div>
+    <div id="google_translate_element" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;"></div>
+  `;
+
+  const btn = document.getElementById("langBtn");
+  const menu = document.getElementById("langMenu");
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = menu.classList.toggle("open");
+    btn.setAttribute("aria-expanded", String(open));
+  });
+  document.addEventListener("click", () => {
+    menu.classList.remove("open");
+    btn.setAttribute("aria-expanded", "false");
+  });
+
+  menu.querySelectorAll(".lang-option").forEach((opt) => {
+    opt.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const lang = opt.dataset.lang;
+      setGoogleTranslateCookie(lang);
+      window.location.reload();
+    });
+  });
+
+  // Load the Google Translate script once per page, only if a non-English
+  // language is active (keeps things snappy for the default English view).
+  if (currentLang.code !== "en" && !window.__apexTranslateLoaded) {
+    window.__apexTranslateLoaded = true;
+    window.googleTranslateElementInit = function () {
+      new google.translate.TranslateElement(
+        { pageLanguage: "en", includedLanguages: TRANSLATE_LANGUAGES.map((l) => l.code).join(","), autoDisplay: false },
+        "google_translate_element"
+      );
+    };
+    const script = document.createElement("script");
+    script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    document.body.appendChild(script);
+  }
+}
 
 function renderHeader() {
   const mount = document.getElementById("site-header");
@@ -29,7 +110,7 @@ function renderHeader() {
           <span class="brand-mark" aria-hidden="true">
             <img src="assets/images/logo.png" alt="" />
           </span>
-          <span class="brand-text">Apex<span class="brand-sub">Education Center</span></span>
+          <span class="brand-text"><span class="notranslate" translate="no">Apex</span><span class="brand-sub">Education Center</span></span>
         </a>
 
         <nav class="main-nav" id="mainNav" aria-label="Main navigation">
@@ -44,6 +125,7 @@ function renderHeader() {
         </nav>
 
         <div class="header-actions">
+          <div class="lang-switcher notranslate" id="langSwitcher" translate="no"></div>
           <a href="registration.html" class="btn btn-accent btn-sm btn-magnetic header-register">Register</a>
           <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
             <span></span><span></span><span></span>
@@ -67,7 +149,7 @@ async function renderFooter() {
         <div class="footer-brand">
           <div style="display:flex;align-items:center;gap:11px;margin-bottom:4px;">
             <span class="brand-mark" aria-hidden="true"><img src="assets/images/logo.png" alt="" /></span>
-            <span class="brand-text light">Apex<span class="brand-sub">Education Center</span></span>
+            <span class="brand-text light"><span class="notranslate" translate="no">Apex</span><span class="brand-sub">Education Center</span></span>
           </div>
           <p>${info.tagline || "Private tutoring, elevated."}</p>
           <div class="social-links">
@@ -82,7 +164,6 @@ async function renderFooter() {
           <ul>
             <li><a href="courses.html">Courses</a></li>
             <li><a href="instructors.html">Instructors</a></li>
-            <li><a href="schedule.html">Schedule</a></li>
             <li><a href="feedback.html">Testimonials</a></li>
           </ul>
         </div>
@@ -109,7 +190,7 @@ async function renderFooter() {
 
       <div class="footer-bottom">
         <div class="container footer-bottom-inner">
-          <p>&copy; ${new Date().getFullYear()} Apex Education Center. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} <span class="notranslate" translate="no">Apex Education Center</span>. All rights reserved.</p>
           <button id="scrollTopBtn" class="scroll-top" aria-label="Scroll to top">${iconSvg("arrow-up")}</button>
         </div>
       </div>
@@ -142,7 +223,7 @@ function renderContactOwner() {
         <div class="contact-promo-inner glass-panel">
           <div class="contact-promo-copy">
             <span class="eyebrow">Direct line</span>
-            <h2 id="contactPromoTitle">Message apex directly</h2>
+            <h2 id="contactPromoTitle">Message <span class="notranslate" translate="no">apex</span> directly</h2>
             <p>Enrollment, scheduling, or partnerships — one form, routed to the owner.</p>
           </div>
           <a href="contact.html#contact-owner" class="btn btn-accent btn-lg btn-magnetic">Contact Owner</a>
@@ -159,7 +240,7 @@ function renderContactOwner() {
         <header class="contact-owner-head">
           <span class="eyebrow eyebrow-on-dark">Owner inbox</span>
           <h1 id="contactOwnerTitle">Contact Owner</h1>
-          <p>Send a message — delivered directly to <strong>apex</strong>. Response within one business day.</p>
+          <p>Send a message — delivered directly to <strong class="notranslate" translate="no">apex</strong>. Response within one business day.</p>
         </header>
         <div class="contact-owner-form-wrap">
           <div class="alert" id="ownerContactAlert"></div>
@@ -182,7 +263,7 @@ function renderContactOwner() {
               <span class="field-error" data-error-for="ownerMessage"></span>
             </div>
             <button type="submit" class="btn btn-contact-owner btn-lg btn-magnetic">
-              Send to apex
+              Send to <span class="notranslate" translate="no">apex</span>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </button>
           </form>
@@ -255,6 +336,7 @@ async function initLayout() {
     await renderFooter();
     wireMobileNav();
     wireStickyHeader();
+    initLanguageSwitcher();
     if (typeof wireMagneticButtons === "function") wireMagneticButtons();
   } catch (err) {
     console.error("Error initializing page layout:", err);

@@ -30,10 +30,12 @@ async function initCoursesPage() {
     instructor: getQueryParam("instructor") || null,
   };
 
-  // Build category filter chips
+  // Build category filter chips (Literature swapped for Agenda/Informatique
+  // via getDisplayCategories, defined in main.js)
+  const displayCategories = getDisplayCategories(categories);
   categoryFilterBar.innerHTML =
     `<button class="filter-btn ${state.category === "all" ? "active" : ""}" data-cat="all">All Subjects</button>` +
-    categories
+    displayCategories
       .map((c) => `<button class="filter-btn ${state.category === c.id ? "active" : ""}" data-cat="${c.id}">${c.name}</button>`)
       .join("");
 
@@ -91,11 +93,10 @@ async function initCourseDetailsPage() {
   if (!mount) return;
 
   const id = getQueryParam("id");
-  const [courses, instructors, categories, schedule] = await Promise.all([
+  const [courses, instructors, categories] = await Promise.all([
     ApexDB.getCollection("courses"),
     ApexDB.getCollection("instructors"),
     ApexDB.getCollection("categories"),
-    ApexDB.getCollection("schedule"),
   ]);
   const course = courses.find((c) => c.id === id);
 
@@ -111,7 +112,6 @@ async function initCourseDetailsPage() {
 
   const instructor = instructors.find((i) => i.id === course.instructorId);
   const category = categories.find((c) => c.id === course.category);
-  const scheduleEntries = schedule.filter((s) => s.courseId === course.id);
 
   document.title = `${course.title} — Apex Education Center`;
 
@@ -137,6 +137,7 @@ async function initCourseDetailsPage() {
       <span class="badge badge-teal">${course.duration}</span>
       <span class="course-price" style="font-size:1.3rem;">$${course.price}<span>/hr</span></span>
     </div>
+    ${typeof courseCurriculumBadgesHTML === "function" ? courseCurriculumBadgesHTML(course) : ""}
 
     <div class="grid-2 mt-lg" style="align-items:start;">
       <div class="reveal">
@@ -144,16 +145,6 @@ async function initCourseDetailsPage() {
         <ul class="syllabus-list">
           ${course.syllabus.map((s, i) => `<li><span class="syllabus-num">${String(i + 1).padStart(2, "0")}</span>${s}</li>`).join("")}
         </ul>
-
-        ${
-          scheduleEntries.length
-            ? `<h2 style="font-size:1.5rem;margin-top:32px;">Weekly Schedule</h2>
-          <table class="schedule-table" style="margin-top:16px;">
-            <thead><tr><th>Day</th><th>Time</th></tr></thead>
-            <tbody>${scheduleEntries.map((s) => `<tr><td data-label="Day">${s.day}</td><td class="time-cell" data-label="Time">${s.time}</td></tr>`).join("")}</tbody>
-          </table>`
-            : ""
-        }
       </div>
 
       ${
@@ -162,7 +153,10 @@ async function initCourseDetailsPage() {
               <div class="instructor-avatar" style="${instructor.photo ? `background-image:url('${instructor.photo}');` : ""}">${instructor.photo ? "" : initials(instructor.name)}</div>
               <h3>${instructor.name}</h3>
               <p class="instructor-subject">${instructor.subject}</p>
+              ${typeof instructorTagsHTML === "function" ? instructorTagsHTML(instructor) : ""}
+              ${instructor.location ? tagGroupHTML("location", "Location", `<p class="instructor-location">${instructor.location}</p>`) : ""}
               <p class="bio">${instructor.bio}</p>
+              ${instructor.availability ? tagGroupHTML("availability", "Availability", `<p class="instructor-availability">${instructor.availability}</p>`) : ""}
               <p class="instructor-exp">${instructor.experience} experience</p>
               <a href="instructors.html" class="btn btn-outline btn-sm">All Instructors</a>
             </div>`

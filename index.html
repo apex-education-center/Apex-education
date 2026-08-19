@@ -26,7 +26,7 @@
         <div class="hero-grid"></div>
         <div class="hero-scrim"></div>
         <div class="hero-glow" id="heroGlow"></div>
-        <div class="hero-brand-mark" id="heroBrandMark">APEX</div>
+        <div class="hero-brand-mark notranslate" id="heroBrandMark" translate="no">APEX</div>
         <svg class="hero-summit" viewBox="0 0 800 400" fill="none" preserveAspectRatio="xMidYMax meet">
           <path class="summit-line" d="M0 340 L180 220 L280 280 L420 120 L520 200 L640 80 L800 180" stroke="url(#summitGrad)" stroke-width="1.5"/>
           <circle class="summit-peak" cx="640" cy="80" r="6" fill="#F5B942"/>
@@ -44,7 +44,7 @@
 
       <div class="container hero-inner">
         <div class="hero-content">
-          <p class="hero-brand-line reveal-stagger">Apex Education Center</p>
+          <p class="hero-brand-line reveal-stagger"><span class="notranslate" translate="no">Apex Education Center</span></p>
           <h1 class="reveal-stagger" id="heroTitle">The summit of personal instruction.</h1>
           <p class="lead reveal-stagger" id="heroSubtitle">Vetted instructors. Real understanding. Online or in person — on your schedule.</p>
           <div class="hero-actions reveal-stagger">
@@ -90,19 +90,51 @@
       </div>
     </section>
 
-    <!-- FEATURED COURSES -->
-    <section class="section-showcase">
+    <!-- EXPLORE — animated portals replacing the old static grids -->
+    <section class="portals-section">
       <div class="container">
         <div class="showcase-head reveal">
           <div>
-            <p class="showcase-kicker">Featured this term</p>
-            <h2>Courses that climb with you</h2>
+            <p class="showcase-kicker">Discover <span class="notranslate" translate="no">Apex</span></p>
+            <h2>Everything, one tap away</h2>
           </div>
-          <a href="courses.html" class="showcase-link">All courses <span aria-hidden="true">→</span></a>
         </div>
-        <div class="card-grid card-grid-showcase" id="featuredCourses"></div>
-        <div class="section-actions-left section-actions-mobile">
-          <a href="courses.html" class="btn btn-primary btn-block">View all courses</a>
+        <div class="portals-grid">
+          <a href="courses.html" class="portal-card portal-card-courses reveal-stagger">
+            <span class="portal-orbit" aria-hidden="true">
+              <svg viewBox="0 0 120 120"><circle class="portal-ring" cx="60" cy="60" r="46"/><circle class="portal-dot" cx="60" cy="14" r="4"/></svg>
+            </span>
+            <span class="portal-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z"/></svg>
+            </span>
+            <h3>Courses</h3>
+            <p><span class="portal-count" id="portalCoursesCount">—</span> active courses across every subject</p>
+            <span class="portal-cta">Browse courses <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
+
+          <a href="instructors.html" class="portal-card portal-card-instructors reveal-stagger">
+            <span class="portal-orbit" aria-hidden="true">
+              <svg viewBox="0 0 120 120"><circle class="portal-ring" cx="60" cy="60" r="46"/><circle class="portal-dot" cx="106" cy="60" r="4"/></svg>
+            </span>
+            <span class="portal-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15 20a5 5 0 0 1 8.5-3.6"/></svg>
+            </span>
+            <h3>Instructors</h3>
+            <p><span class="portal-count" id="portalInstructorsCount">—</span> vetted instructors, online &amp; in person</p>
+            <span class="portal-cta">Meet the team <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
+
+          <a href="feedback.html" class="portal-card portal-card-testimonials reveal-stagger">
+            <span class="portal-orbit" aria-hidden="true">
+              <svg viewBox="0 0 120 120"><circle class="portal-ring" cx="60" cy="60" r="46"/><circle class="portal-dot" cx="60" cy="106" r="4"/></svg>
+            </span>
+            <span class="portal-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg>
+            </span>
+            <h3>Testimonials</h3>
+            <p><span class="portal-count" id="portalTestimonialsCount">—</span> families share their story</p>
+            <span class="portal-cta">Read testimonials <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
         </div>
       </div>
     </section>
@@ -111,7 +143,7 @@
     <section class="why-monumental">
       <div class="container">
         <div class="why-intro reveal">
-          <p class="showcase-kicker">Why Apex</p>
+          <p class="showcase-kicker">Why <span class="notranslate" translate="no">Apex</span></p>
           <h2>Education worth<br />reaching for</h2>
           <p class="copy-lead">We build real understanding through personal attention and instructors who care about how you learn — not just grades.</p>
           <a href="about.html" class="btn btn-outline mt-lg">Our story</a>
@@ -142,37 +174,18 @@
       </div>
     </section>
 
-    <!-- INSTRUCTORS -->
-    <section class="section-showcase section-alt">
-      <div class="container">
-        <div class="showcase-head reveal">
-          <div>
-            <p class="showcase-kicker">The team</p>
-            <h2>Instructors who care</h2>
-          </div>
-          <a href="instructors.html" class="showcase-link">Meet everyone <span aria-hidden="true">→</span></a>
+    <!-- COLLABORATION — Lebanon x France trust strip (no hand graphic) -->
+    <section class="collab-section">
+      <div class="collab-ambient" aria-hidden="true"></div>
+      <div class="container collab-strip reveal">
+        <div class="collab-flags">
+          <span class="collab-flag-chip"><span class="collab-flag">🇱🇧</span> Lebanon</span>
+          <span class="collab-strip-divider" aria-hidden="true"></span>
+          <span class="collab-flag-chip"><span class="collab-flag">🇫🇷</span> France</span>
         </div>
-        <div class="card-grid card-grid-showcase" id="instructorPreview"></div>
-        <div class="section-actions-left section-actions-mobile">
-          <a href="instructors.html" class="btn btn-primary btn-block">Meet all instructors</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- TESTIMONIALS — editorial -->
-    <section class="voices-section">
-      <div class="container">
-        <div class="showcase-head reveal">
-          <div>
-            <p class="showcase-kicker">Voices</p>
-            <h2>What families say</h2>
-          </div>
-          <a href="feedback.html" class="showcase-link">Share yours <span aria-hidden="true">→</span></a>
-        </div>
-        <div class="voices-grid card-grid" id="testimonialPreview"></div>
-        <div class="section-actions-left section-actions-mobile">
-          <a href="feedback.html" class="btn btn-outline btn-block">Share your story</a>
-        </div>
+        <span class="eyebrow eyebrow-on-dark">A cross-border partnership</span>
+        <h2>Built on a Lebanon–France collaboration</h2>
+        <p class="copy-lead"><span class="notranslate" translate="no">Apex</span> brings together instructors and pedagogical standards from both Lebanon and France — giving families an extra layer of confidence in every session, whether preparing for the Bac Libanais or the Bac Français.</p>
       </div>
     </section>
 

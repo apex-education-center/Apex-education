@@ -376,6 +376,158 @@ body.home-wow .site-header.scrolled .nav-toggle span {
     linear-gradient(225deg, #061416, #0D9488);
 }
 
+/* ---------- Explore portals (replaces the old static courses/instructors/testimonials grids) ---------- */
+.portals-section {
+  padding: clamp(80px, 12vw, 140px) 0;
+  background: #060d10;
+}
+.portals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.portal-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 40px 32px 34px;
+  border-radius: 26px;
+  background: rgba(14, 28, 32, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  color: #fff;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+.portal-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), 0 0 44px rgba(46, 196, 182, 0.12);
+  border-color: rgba(46, 196, 182, 0.32);
+}
+.portal-orbit {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 120px;
+  height: 120px;
+  opacity: 0.5;
+  pointer-events: none;
+  animation: portalSpin 14s linear infinite;
+}
+.portal-card:hover .portal-orbit { animation-duration: 5s; }
+.portal-ring { fill: none; stroke: rgba(46, 196, 182, 0.35); stroke-width: 1; stroke-dasharray: 3 7; }
+.portal-dot { fill: var(--amber, #F5B942); }
+@keyframes portalSpin { to { transform: rotate(360deg); } }
+
+.portal-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 58px; height: 58px; border-radius: 18px;
+  background: linear-gradient(135deg, rgba(46, 196, 182, 0.18), rgba(255, 107, 84, 0.12));
+  color: var(--teal-bright);
+  margin-bottom: 6px;
+  transition: transform 0.4s var(--ease);
+}
+.portal-card:hover .portal-icon { transform: scale(1.08) rotate(-4deg); }
+.portal-card-instructors .portal-icon { color: #F5B942; }
+.portal-card-testimonials .portal-icon { color: #FF8A75; }
+
+.portal-card h3 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: 1.7rem;
+  color: #fff;
+}
+.portal-card p { color: rgba(255, 255, 255, 0.55); font-size: 0.92rem; line-height: 1.5; }
+.portal-count {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--teal-bright);
+  font-size: 1rem;
+}
+.portal-cta {
+  margin-top: auto;
+  padding-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+  transition: gap 0.3s var(--ease), color 0.3s;
+}
+.portal-cta svg { transition: transform 0.3s var(--ease); }
+.portal-card:hover .portal-cta { gap: 14px; color: var(--teal-bright); }
+.portal-card:hover .portal-cta svg { transform: translateX(3px); }
+
+/* ---------- Collaboration — Lebanon x France (simple trust strip, no illustration) ---------- */
+.collab-section {
+  position: relative;
+  padding: clamp(64px, 9vw, 110px) 0;
+  background: #0a1418;
+  overflow: hidden;
+}
+.collab-ambient {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 45% 60% at 8% 30%, rgba(226, 78, 55, 0.10), transparent 55%),
+    radial-gradient(ellipse 45% 60% at 92% 70%, rgba(46, 90, 172, 0.14), transparent 55%);
+  animation: collabAmbientDrift 12s ease-in-out infinite alternate;
+}
+@keyframes collabAmbientDrift {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+.collab-strip {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+.collab-strip h2 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 3.6vw, 2.7rem);
+  color: #fff;
+  line-height: 1.15;
+  margin: 10px 0 16px;
+}
+.collab-strip .copy-lead { color: rgba(255, 255, 255, 0.6); margin: 0 auto; }
+.collab-flags {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.collab-flag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-full, 999px);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: background 0.3s, border-color 0.3s, transform 0.3s;
+}
+.collab-flag-chip:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(46, 196, 182, 0.35); transform: translateY(-2px); }
+.collab-flag { font-size: 1.15rem; }
+.collab-strip-divider {
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(226,78,55,0.5), rgba(46,90,172,0.5));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-orbit, .collab-ambient {
+    animation: none !important;
+  }
+}
+
 /* ---------- Why monumental ---------- */
 .why-monumental {
   padding: clamp(90px, 14vw, 160px) 0;

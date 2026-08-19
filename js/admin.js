@@ -147,7 +147,7 @@ function renderPanel(name) {
     overview: renderOverview,
     courses: renderCoursesPanel,
     instructors: renderInstructorsPanel,
-    schedule: renderSchedulePanel,
+    categories: renderCategoriesPanel,
     testimonials: renderTestimonialsPanel,
     registrations: renderRegistrationsPanel,
     announcements: renderAnnouncementsPanel,
@@ -161,6 +161,21 @@ function renderPanel(name) {
 
 function statCard(label, value, icon) {
   return `<div class="stat-card"><div class="stat-card-icon">${icon}</div><div><div class="stat-card-value">${value}</div><div class="stat-card-label">${label}</div></div></div>`;
+}
+
+/** Mirrors main.js's categoryIconSvg (kept local since dashboard.html doesn't load main.js). */
+function categoryIconSvgAdmin(name) {
+  const icons = {
+    calculator: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="12" y1="15" x2="12" y2="15"/><line x1="16" y1="15" x2="16" y2="19"/><line x1="8" y1="19" x2="12" y2="19"/></svg>`,
+    atom: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(120 12 12)"/></svg>`,
+    flask: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6M10 2v6l-6 11a1.5 1.5 0 0 0 1.3 2.2h13.4A1.5 1.5 0 0 0 20 19L14 8V2"/></svg>`,
+    leaf: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13c0-5 4-9 15-10 0 11-4 17-8 17Z"/><path d="M4 20c4-5 6-7 11-13"/></svg>`,
+    book: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z"/><line x1="4" y1="19.5" x2="4" y2="6.5"/></svg>`,
+    globe: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3c2.5 2.7 4 6 4 9s-1.5 6.3-4 9c-2.5-2.7-4-6-4-9s1.5-6.3 4-9Z"/></svg>`,
+    calendar: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>`,
+    laptop: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M1 20h22"/><path d="M9 20l1-4h4l1 4"/></svg>`,
+  };
+  return icons[name] || icons.book;
 }
 
 function iconSvgAdmin(name) {
@@ -318,6 +333,25 @@ function openCourseModal(course, instructors, categories) {
       <div class="form-group"><label>Short Description</label><textarea name="shortDesc" required rows="2">${course?.shortDesc || ""}</textarea></div>
       <div class="form-group"><label>Full Description</label><textarea name="fullDesc" required rows="3">${course?.fullDesc || ""}</textarea></div>
       <div class="form-group"><label>Syllabus (one item per line)</label><textarea name="syllabus" rows="4">${course?.syllabus?.join("\n") || ""}</textarea></div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Bac Curriculum</label>
+          <div class="checkbox-row">
+            <label class="checkbox-pill"><input type="checkbox" name="bac" value="libanais" ${course?.bac?.includes("libanais") ? "checked" : ""}/> Bac Libanais</label>
+            <label class="checkbox-pill"><input type="checkbox" name="bac" value="francais" ${course?.bac?.includes("francais") ? "checked" : ""}/> Bac Français</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Langue(s) d'étude</label>
+          <div class="checkbox-row">
+            <label class="checkbox-pill"><input type="checkbox" name="languages" value="english" ${course?.languages?.includes("english") ? "checked" : ""}/> English</label>
+            <label class="checkbox-pill"><input type="checkbox" name="languages" value="french" ${course?.languages?.includes("french") ? "checked" : ""}/> Français</label>
+          </div>
+        </div>
+      </div>
+      <p class="field-hint" style="margin:-8px 0 16px;">Check both boxes in either row if the course is offered for both Bac systems or in both languages.</p>
+
       <button type="submit" class="btn btn-primary btn-block">${isEdit ? "Save Changes" : "Add Course"}</button>
     </form>
   `);
@@ -339,6 +373,8 @@ function openCourseModal(course, instructors, categories) {
       fullDesc: fd.get("fullDesc").trim(),
       syllabus: fd.get("syllabus").split("\n").map((s) => s.trim()).filter(Boolean),
       image: document.getElementById("courseImageValue").value,
+      bac: fd.getAll("bac"),
+      languages: fd.getAll("languages"),
     };
     const ok = await runAction(
       () => (isEdit ? ApexDB.updateItem("courses", course.id, payload) : ApexDB.addItem("courses", payload)),
@@ -366,23 +402,26 @@ async function renderInstructorsPanel() {
     </div>
     <div class="admin-table-wrap">
       <table class="admin-table">
-        <thead><tr><th></th><th>Name</th><th>Subject</th><th>Email</th><th>Experience</th><th></th></tr></thead>
+        <thead><tr><th></th><th>Name</th><th>Subject</th><th>Mode</th><th>Location</th><th>Experience</th><th></th></tr></thead>
         <tbody>
           ${instructors
-            .map(
-              (i) => `<tr>
+            .map((i) => {
+              const modes = i.modes && i.modes.length ? i.modes : (i.mode ? [i.mode] : []);
+              const modeLabel = modes.length === 2 ? "Online + Présentiel" : modes.length === 1 ? (modes[0] === "online" ? "Online" : "Présentiel") : "—";
+              return `<tr>
                 <td>${i.photo ? `<img src="${i.photo}" class="row-thumb" style="border-radius:50%;"/>` : `<div class="row-thumb" style="border-radius:50%;"></div>`}</td>
-                <td>${i.name}</td>
+                <td>${i.name}${i.email ? `<div style="color:var(--color-text-faint);font-size:0.78rem;">${i.email}</div>` : ""}</td>
                 <td>${i.subject}</td>
-                <td>${i.email}</td>
+                <td>${modeLabel}</td>
+                <td>${i.location || "—"}</td>
                 <td>${i.experience}</td>
                 <td><div class="table-actions">
                   <button class="icon-btn" data-edit-instructor="${i.id}">${iconSvgAdmin("edit")}</button>
                   <button class="icon-btn danger" data-delete-instructor="${i.id}">${iconSvgAdmin("trash")}</button>
                 </div></td>
-              </tr>`
-            )
-            .join("") || emptyRow(6, "No instructors yet.")}
+              </tr>`;
+            })
+            .join("") || emptyRow(7, "No instructors yet.")}
         </tbody>
       </table>
     </div>
@@ -403,6 +442,10 @@ async function renderInstructorsPanel() {
 
 function openInstructorModal(instructor) {
   const isEdit = Boolean(instructor);
+  const modes = instructor?.modes && instructor.modes.length ? instructor.modes : (instructor?.mode ? [instructor.mode.toLowerCase()] : []);
+  const bacValues = instructor?.bac && instructor.bac.length ? instructor.bac : (instructor?.bac ? [instructor.bac] : []);
+  const langValues = instructor?.teachingLanguages && instructor.teachingLanguages.length ? instructor.teachingLanguages : [];
+
   openModal(`
     <div class="modal-header"><h3>${isEdit ? "Edit Instructor" : "Add Instructor"}</h3><button class="modal-close">${iconSvgAdmin("close")}</button></div>
     <form id="instructorForm">
@@ -416,9 +459,45 @@ function openInstructorModal(instructor) {
       <div class="form-grid">
         <div class="form-group"><label>Full Name</label><input name="name" required value="${instructor?.name || ""}"/></div>
         <div class="form-group"><label>Subject</label><input name="subject" required value="${instructor?.subject || ""}"/></div>
-        <div class="form-group"><label>Email</label><input type="email" name="email" required value="${instructor?.email || ""}"/></div>
+        <div class="form-group"><label>Email <span class="field-hint" style="display:inline;">(optional)</span></label><input type="email" name="email" value="${instructor?.email || ""}" placeholder="Optional"/></div>
         <div class="form-group"><label>Experience</label><input name="experience" required value="${instructor?.experience || ""}" placeholder="e.g. 8 years"/></div>
       </div>
+
+      <div class="form-group">
+        <label>Teaching Mode</label>
+        <div class="checkbox-row">
+          <label class="checkbox-pill"><input type="checkbox" name="modes" value="online" ${modes.includes("online") ? "checked" : ""}/> Online</label>
+          <label class="checkbox-pill"><input type="checkbox" name="modes" value="presentiel" ${modes.includes("presentiel") ? "checked" : ""}/> Présentiel (in person)</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Location <span class="field-hint" style="display:inline;">(for in-person sessions, e.g. "Achrafieh, Beirut")</span></label>
+        <input name="location" value="${instructor?.location || ""}" placeholder="Area / city"/>
+      </div>
+
+      <div class="form-group">
+        <label>Availability / Disponibilité <span class="field-hint" style="display:inline;">(shown to students)</span></label>
+        <textarea name="availability" rows="2" placeholder="e.g. Weekdays 4–8pm, Saturday mornings">${instructor?.availability || ""}</textarea>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Bac Curriculum</label>
+          <div class="checkbox-row">
+            <label class="checkbox-pill"><input type="checkbox" name="bac" value="libanais" ${bacValues.includes("libanais") ? "checked" : ""}/> Bac Libanais</label>
+            <label class="checkbox-pill"><input type="checkbox" name="bac" value="francais" ${bacValues.includes("francais") ? "checked" : ""}/> Bac Français</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Language of Teaching</label>
+          <div class="checkbox-row">
+            <label class="checkbox-pill"><input type="checkbox" name="teachingLanguages" value="english" ${langValues.includes("english") ? "checked" : ""}/> English</label>
+            <label class="checkbox-pill"><input type="checkbox" name="teachingLanguages" value="french" ${langValues.includes("french") ? "checked" : ""}/> Français</label>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group"><label>Bio</label><textarea name="bio" required rows="3">${instructor?.bio || ""}</textarea></div>
       <button type="submit" class="btn btn-primary btn-block">${isEdit ? "Save Changes" : "Add Instructor"}</button>
     </form>
@@ -432,10 +511,15 @@ function openInstructorModal(instructor) {
     const payload = {
       name: fd.get("name").trim(),
       subject: fd.get("subject").trim(),
-      email: fd.get("email").trim(),
+      email: fd.get("email") ? fd.get("email").trim() : "",
       experience: fd.get("experience").trim(),
       bio: fd.get("bio").trim(),
       photo: document.getElementById("instructorImageValue").value,
+      modes: fd.getAll("modes"),
+      location: fd.get("location") ? fd.get("location").trim() : "",
+      availability: fd.get("availability") ? fd.get("availability").trim() : "",
+      bac: fd.getAll("bac"),
+      teachingLanguages: fd.getAll("teachingLanguages"),
     };
     const ok = await runAction(
       () => (isEdit ? ApexDB.updateItem("instructors", instructor.id, payload) : ApexDB.addItem("instructors", payload)),
@@ -449,84 +533,92 @@ function openInstructorModal(instructor) {
 }
 
 /* ============================================================
-   SCHEDULE
+   CATEGORIES (subjects shown in the homepage wheel/marquee and
+   the course filter bar)
    ============================================================ */
-async function renderSchedulePanel() {
-  const el = document.getElementById("panel-schedule");
+const CATEGORY_ICON_OPTIONS = [
+  { key: "calculator", label: "Calculator (Math)" },
+  { key: "atom", label: "Atom (Physics)" },
+  { key: "flask", label: "Flask (Chemistry)" },
+  { key: "leaf", label: "Leaf (Biology)" },
+  { key: "book", label: "Book (Languages/General)" },
+  { key: "globe", label: "Globe (Languages)" },
+  { key: "calendar", label: "Calendar (Agenda)" },
+  { key: "laptop", label: "Laptop (Informatique)" },
+];
+
+async function renderCategoriesPanel() {
+  const el = document.getElementById("panel-categories");
   el.innerHTML = `<p style="color:var(--color-text-faint);">Loading…</p>`;
-  const [schedule, courses, instructors] = await Promise.all([
-    ApexDB.getCollection("schedule"),
-    ApexDB.getCollection("courses"),
-    ApexDB.getCollection("instructors"),
-  ]);
+  const categories = await ApexDB.getCollection("categories");
 
   el.innerHTML = `
     <div class="admin-toolbar">
-      <h2>Schedule (${schedule.length})</h2>
-      <button class="btn btn-primary btn-sm" id="addScheduleBtn">+ Add Time Slot</button>
+      <h2>Categories (${categories.length})</h2>
+      <button class="btn btn-primary btn-sm" id="addCategoryBtn">+ Add Category</button>
     </div>
+    <p style="color:var(--color-text-muted);font-size:0.86rem;margin:-8px 0 18px;">
+      These are the subjects shown in the homepage wheel and the course filter bar. Drag order isn't supported yet — new categories are appended to the end.
+    </p>
     <div class="admin-table-wrap">
       <table class="admin-table">
-        <thead><tr><th>Course</th><th>Instructor</th><th>Day</th><th>Time</th><th></th></tr></thead>
+        <thead><tr><th></th><th>Name</th><th>Icon</th><th></th></tr></thead>
         <tbody>
-          ${schedule
-            .map((s) => {
-              const course = courses.find((c) => c.id === s.courseId);
-              const instr = instructors.find((i) => i.id === s.instructorId);
-              return `<tr>
-                <td>${course ? course.title : "—"}</td>
-                <td>${instr ? instr.name : "—"}</td>
-                <td>${s.day}</td>
-                <td class="time-cell">${s.time}</td>
-                <td><div class="table-actions"><button class="icon-btn danger" data-delete-schedule="${s.id}">${iconSvgAdmin("trash")}</button></div></td>
-              </tr>`;
-            })
-            .join("") || emptyRow(5, "No schedule entries yet.")}
+          ${categories
+            .map(
+              (c) => `<tr>
+                <td style="width:40px;color:var(--color-primary);">${categoryIconSvgAdmin(c.icon)}</td>
+                <td>${c.name}</td>
+                <td>${c.icon || "book"}</td>
+                <td><div class="table-actions">
+                  <button class="icon-btn" data-edit-category="${c.id}">${iconSvgAdmin("edit")}</button>
+                  <button class="icon-btn danger" data-delete-category="${c.id}">${iconSvgAdmin("trash")}</button>
+                </div></td>
+              </tr>`
+            )
+            .join("") || emptyRow(4, "No categories yet — add one to populate the homepage wheel.")}
         </tbody>
       </table>
     </div>
   `;
 
-  document.getElementById("addScheduleBtn").addEventListener("click", () => openScheduleModal(courses, instructors));
-  el.querySelectorAll("[data-delete-schedule]").forEach((b) =>
+  document.getElementById("addCategoryBtn").addEventListener("click", () => openCategoryModal(null));
+  el.querySelectorAll("[data-edit-category]").forEach((b) =>
+    b.addEventListener("click", () => openCategoryModal(categories.find((c) => c.id === b.dataset.editCategory)))
+  );
+  el.querySelectorAll("[data-delete-category]").forEach((b) =>
     b.addEventListener("click", () =>
-      confirmDelete("Remove this schedule entry?", async () => {
-        if (await runAction(() => ApexDB.deleteItem("schedule", b.dataset.deleteSchedule), "Schedule entry removed.")) renderSchedulePanel();
+      confirmDelete("Delete this category? Courses using it will show no subject until reassigned.", async () => {
+        if (await runAction(() => ApexDB.deleteItem("categories", b.dataset.deleteCategory), "Category deleted.")) renderCategoriesPanel();
       })
     )
   );
 }
 
-function openScheduleModal(courses, instructors) {
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
+function openCategoryModal(category) {
+  const isEdit = Boolean(category);
   openModal(`
-    <div class="modal-header"><h3>Add Time Slot</h3><button class="modal-close">${iconSvgAdmin("close")}</button></div>
-    <form id="scheduleForm">
-      <div class="form-group"><label>Course</label>
-        <select name="courseId" required>${courses.map((c) => `<option value="${c.id}">${c.title}</option>`).join("")}</select>
+    <div class="modal-header"><h3>${isEdit ? "Edit Category" : "Add Category"}</h3><button class="modal-close">${iconSvgAdmin("close")}</button></div>
+    <form id="categoryForm">
+      <div class="form-group"><label>Name</label><input name="name" required value="${category?.name || ""}" placeholder="e.g. Informatique"/></div>
+      <div class="form-group"><label>Icon</label>
+        <select name="icon">${CATEGORY_ICON_OPTIONS.map((o) => `<option value="${o.key}" ${category?.icon === o.key ? "selected" : ""}>${o.label}</option>`).join("")}</select>
       </div>
-      <div class="form-group"><label>Instructor</label>
-        <select name="instructorId" required>${instructors.map((i) => `<option value="${i.id}">${i.name}</option>`).join("")}</select>
-      </div>
-      <div class="form-grid">
-        <div class="form-group"><label>Day</label><select name="day" required>${days.map((d) => `<option>${d}</option>`).join("")}</select></div>
-        <div class="form-group"><label>Time</label><input name="time" required placeholder="16:00 - 17:30"/></div>
-      </div>
-      <button type="submit" class="btn btn-primary btn-block">Add Time Slot</button>
+      <button type="submit" class="btn btn-primary btn-block">${isEdit ? "Save Changes" : "Add Category"}</button>
     </form>
   `);
 
-  document.getElementById("scheduleForm").addEventListener("submit", async (e) => {
+  document.getElementById("categoryForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
+    const payload = { name: fd.get("name").trim(), icon: fd.get("icon") };
     const ok = await runAction(
-      () => ApexDB.addItem("schedule", { courseId: fd.get("courseId"), instructorId: fd.get("instructorId"), day: fd.get("day"), time: fd.get("time").trim() }),
-      "Time slot added."
+      () => (isEdit ? ApexDB.updateItem("categories", category.id, payload) : ApexDB.addItem("categories", payload)),
+      isEdit ? "Category updated." : "Category added."
     );
     if (ok) {
       closeModal();
-      renderSchedulePanel();
+      renderCategoriesPanel();
     }
   });
 }
