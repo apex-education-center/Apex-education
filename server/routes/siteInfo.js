@@ -1,4 +1,5 @@
 const express = require("express");
+const crypto = require("crypto");
 const pool = require("../db/pool");
 const { requireAdmin } = require("../middleware/adminAuth");
 
@@ -37,6 +38,33 @@ router.patch("/stats", requireAdmin, async (req, res) => {
 router.get("/categories", async (req, res) => {
   const result = await pool.query(`SELECT id, name, icon FROM categories ORDER BY name`);
   res.json(result.rows);
+});
+
+router.post("/categories", requireAdmin, async (req, res) => {
+  const { name, icon = "book" } = req.body;
+  if (!name) return res.status(400).json({ error: "Name is required." });
+  const id = `category-${crypto.randomUUID()}`;
+  const result = await pool.query(
+    `INSERT INTO categories (id, name, icon) VALUES ($1,$2,$3) RETURNING id, name, icon`,
+    [id, name, icon]
+  );
+  res.status(201).json(result.rows[0]);
+});
+
+router.patch("/categories/:id", requireAdmin, async (req, res) => {
+  const { name, icon } = req.body;
+  const result = await pool.query(
+    `UPDATE categories SET name = COALESCE($2, name), icon = COALESCE($3, icon)
+     WHERE id = $1 RETURNING id, name, icon`,
+    [req.params.id, name, icon]
+  );
+  if (!result.rows[0]) return res.status(404).json({ error: "Category not found." });
+  res.json(result.rows[0]);
+});
+
+router.delete("/categories/:id", requireAdmin, async (req, res) => {
+  await pool.query(`DELETE FROM categories WHERE id = $1`, [req.params.id]);
+  res.json({ ok: true });
 });
 
 module.exports = router;
