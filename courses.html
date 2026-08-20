@@ -39,6 +39,27 @@
           <button class="filter-btn" data-mode="online">Online</button>
           <button class="filter-btn" data-mode="présentiel">Présentiel</button>
         </div>
+        <div class="filter-panel" id="priceBar">
+          <div class="filter-sort">
+            <label for="priceSort">Sort by price</label>
+            <select id="priceSort">
+              <option value="default">Default</option>
+              <option value="price-asc">Lowest to highest</option>
+              <option value="price-desc">Highest to lowest</option>
+            </select>
+          </div>
+          <div class="range-field">
+            <div class="range-field-head">
+              <label>Price range</label>
+              <span class="range-field-values"><span id="priceMinLabel">$0</span> – <span id="priceMaxLabel">$0</span> /hr</span>
+            </div>
+            <div class="range-slider">
+              <div class="range-slider-track"><div class="range-slider-fill" id="priceFill"></div></div>
+              <input type="range" id="priceMin" />
+              <input type="range" id="priceMax" />
+            </div>
+          </div>
+        </div>
         <p id="resultCount" style="text-align:left;color:var(--text-faint);font-size:0.88rem;margin-bottom:24px;"></p>
         <div class="card-grid" id="coursesGrid"></div>
         <div class="empty-state" id="coursesEmpty" style="display:none;">

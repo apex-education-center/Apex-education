@@ -80,6 +80,7 @@ const TAG_ICONS = {
   lang: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3c2.5 2.7 4 6 4 9s-1.5 6.3-4 9c-2.5-2.7-4-6-4-9s1.5-6.3 4-9Z"/></svg>`,
   location: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
   availability: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+  about: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4Z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>`,
 };
 
 function tagGroupHTML(iconKey, label, innerHTML) {
@@ -131,7 +132,7 @@ function instructorCardHTML(instructor) {
       <p class="instructor-subject">${instructor.subject}</p>
       ${instructorTagsHTML(instructor)}
       ${instructor.location ? tagGroupHTML("location", "Location", `<p class="instructor-location">${instructor.location}</p>`) : ""}
-      <p class="bio">${instructor.bio}</p>
+      ${instructor.bio ? tagGroupHTML("about", "About", `<p class="bio">${instructor.bio}</p>`) : ""}
       ${instructor.availability ? tagGroupHTML("availability", "Availability", `<p class="instructor-availability">${instructor.availability}</p>`) : ""}
       <p class="instructor-exp">${instructor.experience} experience</p>
       <a href="courses.html?instructor=${instructor.id}" class="btn btn-outline btn-sm">View Courses</a>
@@ -242,6 +243,84 @@ function initScrollCue() {
 }
 
 /* ---------- Tilt-on-hover for cards (cinematic 3D on apex-cinema pages) ---------- */
+/**
+ * Wires a dual-handle range slider (two overlapping <input type="range">
+ * with a visual fill track between them). Reused for both the course price
+ * filter and the instructor experience filter.
+ *
+ * Expects in the DOM: `${idPrefix}Min` / `${idPrefix}Max` range inputs,
+ * `${idPrefix}Fill` fill bar, and `${idPrefix}MinLabel` / `${idPrefix}MaxLabel`
+ * value displays — all optional except the two range inputs.
+ */
+function initDualRangeSlider({ idPrefix, min, max, step = 1, onChange, formatLabel = (v) => v }) {
+  const minInput = document.getElementById(`${idPrefix}Min`);
+  const maxInput = document.getElementById(`${idPrefix}Max`);
+  if (!minInput || !maxInput) return null;
+  const fill = document.getElementById(`${idPrefix}Fill`);
+  const minLabel = document.getElementById(`${idPrefix}MinLabel`);
+  const maxLabel = document.getElementById(`${idPrefix}MaxLabel`);
+
+  // Guard against a degenerate range (e.g. every course is the same price).
+  if (max <= min) max = min + 1;
+
+  [minInput, maxInput].forEach((el) => {
+    el.min = min;
+    el.max = max;
+    el.step = step;
+  });
+  minInput.value = min;
+  maxInput.value = max;
+
+  const pct = (v) => ((v - min) / (max - min)) * 100;
+
+  function paint() {
+    const minVal = Number(minInput.value);
+    const maxVal = Number(maxInput.value);
+    if (fill) {
+      fill.style.left = pct(minVal) + "%";
+      fill.style.width = Math.max(0, pct(maxVal) - pct(minVal)) + "%";
+    }
+    if (minLabel) minLabel.textContent = formatLabel(minVal);
+    if (maxLabel) maxLabel.textContent = formatLabel(maxVal);
+    return [minVal, maxVal];
+  }
+
+  let debounceId;
+  function handleInput() {
+    // Never let the handles cross each other.
+    if (Number(minInput.value) > Number(maxInput.value)) {
+      if (document.activeElement === minInput) maxInput.value = minInput.value;
+      else minInput.value = maxInput.value;
+    }
+    const [minVal, maxVal] = paint();
+    clearTimeout(debounceId);
+    debounceId = setTimeout(() => onChange(minVal, maxVal), 120);
+  }
+
+  // Whichever thumb the person grabs gets top z-index for the drag, so
+  // overlapping thumbs near the same value can still both be reached.
+  minInput.addEventListener("pointerdown", () => {
+    minInput.style.zIndex = 5;
+    maxInput.style.zIndex = 4;
+  });
+  maxInput.addEventListener("pointerdown", () => {
+    maxInput.style.zIndex = 5;
+    minInput.style.zIndex = 4;
+  });
+
+  minInput.addEventListener("input", handleInput);
+  maxInput.addEventListener("input", handleInput);
+
+  paint();
+  return {
+    reset() {
+      minInput.value = min;
+      maxInput.value = max;
+      paint();
+    },
+  };
+}
+
 function wireTiltCards(selector) {
   if (window.matchMedia("(hover: none)").matches) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -489,27 +568,40 @@ function initCounters() {
 function initNewsletter() {
   const form = document.getElementById("newsletterForm");
   if (!form) return;
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const input = form.elements["newsletterEmail"];
+
+  function setMsg(text, type) {
     const msg =
       form.querySelector(".newsletter-msg") ||
       form.parentElement?.querySelector(".newsletter-msg") ||
       document.querySelector(".finale .newsletter-msg");
     if (!msg) return;
+    // Smooth fade: drop the visible state, swap text on the next frame, fade back in.
+    msg.classList.remove("show");
+    requestAnimationFrame(() => {
+      msg.textContent = text;
+      msg.classList.remove("success", "error");
+      msg.classList.add(type, "show");
+    });
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const input = form.elements["newsletterEmail"];
+    const phoneInput = form.elements["newsletterPhone"];
+    const submitBtn = form.querySelector('button[type="submit"]');
     if (!input.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
-      msg.textContent = "Enter a valid email address.";
-      msg.style.color = "var(--coral)";
+      setMsg("Enter a valid email address.", "error");
       return;
     }
+    if (submitBtn) submitBtn.disabled = true;
     try {
-      await ApexDB.subscribeNewsletter(input.value.trim());
-      msg.textContent = "Subscribed! Watch your inbox for updates.";
-      msg.style.color = "var(--teal-bright, var(--teal))";
+      await ApexDB.subscribeNewsletter(input.value.trim(), phoneInput ? phoneInput.value.trim() : "");
+      setMsg("You're in! Watch your inbox for updates.", "success");
       form.reset();
     } catch (err) {
-      msg.textContent = err.message || "Something went wrong. Please try again.";
-      msg.style.color = "var(--coral)";
+      setMsg(err.message || "Something went wrong. Please try again.", "error");
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
 }
@@ -521,6 +613,17 @@ async function initInstructorsPage() {
   const instructors = await ApexDB.getCollection("instructors");
   const subjects = Array.from(new Set(instructors.map((i) => i.subject)));
   const filterBar = document.getElementById("subjectFilterBar");
+  const sortSelect = document.getElementById("experienceSort");
+  const resultCount = document.getElementById("instructorResultCount");
+
+  // Experience is free text on the instructor record (e.g. "8 years"), so
+  // pull out the first number for sorting/filtering purposes.
+  function experienceYears(instructor) {
+    const match = String(instructor.experience || "").match(/\d+/);
+    return match ? Number(match[0]) : 0;
+  }
+
+  let state = { subject: "all", sort: "default", expMin: null, expMax: null };
 
   filterBar.innerHTML =
     `<button class="filter-btn active" data-subject="all">All Subjects</button>` +
@@ -530,16 +633,54 @@ async function initInstructorsPage() {
     const btn = e.target.closest(".filter-btn");
     if (!btn) return;
     filterBar.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
-    const subject = btn.dataset.subject;
-    const filtered = subject === "all" ? instructors : instructors.filter((i) => i.subject === subject);
+    state.subject = btn.dataset.subject;
+    render();
+  });
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      state.sort = sortSelect.value;
+      render();
+    });
+  }
+
+  const expYears = instructors.map(experienceYears);
+  const expFloor = expYears.length ? Math.floor(Math.min(...expYears)) : 0;
+  const expCeil = expYears.length ? Math.ceil(Math.max(...expYears)) : 10;
+  initDualRangeSlider({
+    idPrefix: "experience",
+    min: expFloor,
+    max: expCeil,
+    step: 1,
+    formatLabel: (v) => v,
+    onChange: (minVal, maxVal) => {
+      state.expMin = minVal;
+      state.expMax = maxVal;
+      render();
+    },
+  });
+  state.expMin = expFloor;
+  state.expMax = expCeil;
+
+  function render() {
+    let filtered = instructors.filter((i) => {
+      const matchesSubject = state.subject === "all" || i.subject === state.subject;
+      const years = experienceYears(i);
+      const matchesMin = state.expMin == null || years >= state.expMin;
+      const matchesMax = state.expMax == null || years <= state.expMax;
+      return matchesSubject && matchesMin && matchesMax;
+    });
+
+    if (state.sort === "exp-asc") filtered = filtered.slice().sort((a, b) => experienceYears(a) - experienceYears(b));
+    else if (state.sort === "exp-desc") filtered = filtered.slice().sort((a, b) => experienceYears(b) - experienceYears(a));
+
+    if (resultCount) resultCount.textContent = `${filtered.length} instructor${filtered.length === 1 ? "" : "s"} found`;
     grid.innerHTML = filtered.map(instructorCardHTML).join("");
     initScrollReveal();
     wireTiltCards(".instructor-card");
-  });
+  }
 
-  grid.innerHTML = instructors.map(instructorCardHTML).join("");
-  initScrollReveal();
-  wireTiltCards(".instructor-card");
+  render();
 }
 
 /* ---------- Registration page ---------- */
@@ -547,14 +688,32 @@ async function initRegistrationPage() {
   const form = document.getElementById("registrationForm");
   if (!form) return;
 
-  const courses = await ApexDB.getCollection("courses");
+  const [courses, instructors] = await Promise.all([ApexDB.getCollection("courses"), ApexDB.getCollection("instructors")]);
   const courseSelect = form.elements["courseId"];
   courseSelect.innerHTML =
     `<option value="">General inquiry (no specific course)</option>` +
     courses.map((c) => `<option value="${c.id}">${c.title}</option>`).join("");
 
+  const instructorSelect = form.elements["instructorId"];
+  if (instructorSelect) {
+    instructorSelect.innerHTML =
+      `<option value="">No preference</option>` +
+      instructors.map((i) => `<option value="${i.id}">${i.name} — ${i.subject}</option>`).join("");
+
+    // When a course is picked, default the instructor to whoever teaches it —
+    // several instructors can teach the same subject, so the student can
+    // still change it if they'd rather have someone else.
+    courseSelect.addEventListener("change", () => {
+      const course = courses.find((c) => c.id === courseSelect.value);
+      if (course && course.instructorId) instructorSelect.value = course.instructorId;
+    });
+  }
+
   const preselect = getQueryParam("course");
-  if (preselect) courseSelect.value = preselect;
+  if (preselect) {
+    courseSelect.value = preselect;
+    courseSelect.dispatchEvent(new Event("change"));
+  }
 
   const alertEl = document.getElementById("registrationAlert");
   const submitBtn = form.querySelector('button[type="submit"]');
@@ -575,6 +734,7 @@ async function initRegistrationPage() {
           email: data.email,
           phone: data.phone,
           courseId: courseSelect.value || null,
+          instructorId: instructorSelect ? instructorSelect.value || null : null,
           notes: form.elements["notes"] ? form.elements["notes"].value.trim() : "",
         });
         showAlert(alertEl, "Registration submitted! We'll confirm your session by email or WhatsApp within 24 hours.", "success");
@@ -775,6 +935,7 @@ async function renderHomepage() {
     // the portal cards) must still fade in instead of staying invisible.
     initScrollReveal();
     wireTiltCards(".portal-card");
+    wireTiltCards(".newsletter-card");
     wireMagneticButtons();
     initCounters();
   }

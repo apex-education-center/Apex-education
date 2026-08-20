@@ -16,6 +16,7 @@ const ApexDB = (() => {
     announcements: "/api/announcements",
     faqs: "/api/faqs",
     registrations: "/api/registrations",
+    newsletter: "/api/newsletter",
   };
 
   async function request(url, options = {}) {
@@ -111,8 +112,8 @@ const ApexDB = (() => {
     return request("/api/contact-owner", { method: "POST", body: JSON.stringify(data) });
   }
 
-  async function subscribeNewsletter(email) {
-    return request("/api/newsletter", { method: "POST", body: JSON.stringify({ email }) });
+  async function subscribeNewsletter(email, phone = "") {
+    return request("/api/newsletter", { method: "POST", body: JSON.stringify({ email, phone }) });
   }
 
   // ---- Admin auth ----

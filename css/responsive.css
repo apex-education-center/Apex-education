@@ -221,6 +221,13 @@ body {
   }
   .search-bar input { width: 100%; }
 
+  .filter-panel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .range-field { min-width: 0; }
+
   /* Forms */
   .form-card { padding: 28px 18px; }
   .btn { min-height: 44px; }

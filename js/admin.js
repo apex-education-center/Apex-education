@@ -150,6 +150,7 @@ function renderPanel(name) {
     categories: renderCategoriesPanel,
     testimonials: renderTestimonialsPanel,
     registrations: renderRegistrationsPanel,
+    newsletter: renderNewsletterPanel,
     announcements: renderAnnouncementsPanel,
     faqs: renderFaqsPanel,
     homepage: renderHomepagePanel,
@@ -691,7 +692,7 @@ async function renderRegistrationsPanel() {
     <div class="admin-toolbar"><h2>Registrations (${registrations.length})</h2></div>
     <div class="admin-table-wrap">
       <table class="admin-table">
-        <thead><tr><th>Student</th><th>Contact</th><th>Course</th><th>Date Submitted</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>Student</th><th>Contact</th><th>Course</th><th>Preferred Instructor</th><th>Date Submitted</th><th>Status</th><th></th></tr></thead>
         <tbody>
           ${registrations
             .map((r) => {
@@ -700,6 +701,7 @@ async function renderRegistrationsPanel() {
                 <td>${r.studentName}</td>
                 <td>${r.email}<div style="color:var(--color-text-faint);font-size:0.78rem;">${r.phone || ""}</div></td>
                 <td>${r.courseTitle || "General inquiry"}</td>
+                <td>${r.instructorName || "No preference"}</td>
                 <td>${new Date(r.createdAt).toLocaleDateString()}</td>
                 <td><span class="status-pill status-${status}">${status}</span>
                   ${r.meetingLink ? `<div style="margin-top:4px;"><a href="${r.meetingLink}" target="_blank" rel="noopener noreferrer" style="font-size:0.76rem;color:var(--color-primary);">Meet link ↗</a></div>` : ""}
@@ -710,7 +712,7 @@ async function renderRegistrationsPanel() {
                 </div></td>
               </tr>`;
             })
-            .join("") || emptyRow(6, "No registrations submitted yet.")}
+            .join("") || emptyRow(7, "No registrations submitted yet.")}
         </tbody>
       </table>
     </div>
@@ -782,8 +784,60 @@ function openConfirmMeetingModal(reg) {
 }
 
 /* ============================================================
-   ANNOUNCEMENTS
+   NEWSLETTER SUBSCRIBERS
    ============================================================ */
+async function renderNewsletterPanel() {
+  const el = document.getElementById("panel-newsletter");
+  el.innerHTML = `<p style="color:var(--color-text-faint);">Loading…</p>`;
+  const subscribers = await ApexDB.getCollection("newsletter");
+
+  el.innerHTML = `
+    <div class="admin-toolbar">
+      <h2>Newsletter Subscribers (${subscribers.length})</h2>
+      <button class="btn btn-outline btn-sm" id="exportNewsletterBtn">Export CSV</button>
+    </div>
+    <p style="color:var(--color-text-muted);font-size:0.86rem;margin:-8px 0 18px;">
+      Everyone who subscribed on the homepage. Use the export to send announcements or new-course updates through your own email/SMS tool.
+    </p>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Email</th><th>Phone</th><th>Subscribed</th><th></th></tr></thead>
+        <tbody>
+          ${subscribers
+            .map(
+              (s) => `<tr>
+                <td>${s.email}</td>
+                <td>${s.phone || "—"}</td>
+                <td>${s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}</td>
+                <td><div class="table-actions"><button class="icon-btn danger" data-delete-sub="${s.id}">${iconSvgAdmin("trash")}</button></div></td>
+              </tr>`
+            )
+            .join("") || emptyRow(4, "No newsletter subscribers yet.")}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById("exportNewsletterBtn").addEventListener("click", () => {
+    const rows = [["Email", "Phone", "Subscribed"], ...subscribers.map((s) => [s.email, s.phone || "", s.createdAt || ""])];
+    const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "apex-newsletter-subscribers.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  el.querySelectorAll("[data-delete-sub]").forEach((b) =>
+    b.addEventListener("click", () =>
+      confirmDelete("Remove this subscriber?", async () => {
+        if (await runAction(() => ApexDB.deleteItem("newsletter", b.dataset.deleteSub), "Subscriber removed.")) renderNewsletterPanel();
+      })
+    )
+  );
+}
 async function renderAnnouncementsPanel() {
   const el = document.getElementById("panel-announcements");
   el.innerHTML = `<p style="color:var(--color-text-faint);">Loading…</p>`;

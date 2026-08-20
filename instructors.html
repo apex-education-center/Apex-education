@@ -31,6 +31,28 @@
     <section class="cinema-stage">
       <div class="container">
         <div class="filter-bar" id="subjectFilterBar"></div>
+        <div class="filter-panel" id="experienceBar">
+          <div class="filter-sort">
+            <label for="experienceSort">Sort by experience</label>
+            <select id="experienceSort">
+              <option value="default">Default</option>
+              <option value="exp-asc">Lowest to highest</option>
+              <option value="exp-desc">Highest to lowest</option>
+            </select>
+          </div>
+          <div class="range-field">
+            <div class="range-field-head">
+              <label>Experience</label>
+              <span class="range-field-values"><span id="experienceMinLabel">0</span> – <span id="experienceMaxLabel">0</span> yrs</span>
+            </div>
+            <div class="range-slider">
+              <div class="range-slider-track"><div class="range-slider-fill" id="experienceFill"></div></div>
+              <input type="range" id="experienceMin" />
+              <input type="range" id="experienceMax" />
+            </div>
+          </div>
+        </div>
+        <p id="instructorResultCount" style="text-align:left;color:var(--text-faint);font-size:0.88rem;margin-bottom:24px;"></p>
         <div class="card-grid" id="instructorsGrid"></div>
       </div>
     </section>

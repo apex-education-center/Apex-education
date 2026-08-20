@@ -20,6 +20,7 @@ async function initCoursesPage() {
   const searchInput = document.getElementById("courseSearch");
   const categoryFilterBar = document.getElementById("categoryFilterBar");
   const modeFilterBar = document.getElementById("modeFilterBar");
+  const priceSort = document.getElementById("priceSort");
   const emptyState = document.getElementById("coursesEmpty");
   const resultCount = document.getElementById("resultCount");
 
@@ -28,7 +29,28 @@ async function initCoursesPage() {
     category: getQueryParam("category") || "all",
     mode: "all",
     instructor: getQueryParam("instructor") || null,
+    sort: "default",
+    priceMin: null,
+    priceMax: null,
   };
+
+  const prices = courses.map((c) => Number(c.price) || 0);
+  const priceFloor = prices.length ? Math.floor(Math.min(...prices)) : 0;
+  const priceCeil = prices.length ? Math.ceil(Math.max(...prices)) : 100;
+  initDualRangeSlider({
+    idPrefix: "price",
+    min: priceFloor,
+    max: priceCeil,
+    step: 1,
+    formatLabel: (v) => `$${v}`,
+    onChange: (minVal, maxVal) => {
+      state.priceMin = minVal;
+      state.priceMax = maxVal;
+      render();
+    },
+  });
+  state.priceMin = priceFloor;
+  state.priceMax = priceCeil;
 
   // Build category filter chips (Literature swapped for Agenda/Informatique
   // via getDisplayCategories, defined in main.js)
@@ -60,14 +82,27 @@ async function initCoursesPage() {
     render();
   });
 
+  if (priceSort) {
+    priceSort.addEventListener("change", () => {
+      state.sort = priceSort.value;
+      render();
+    });
+  }
+
   function render() {
     let filtered = courses.filter((c) => {
       const matchesSearch = !state.search || c.title.toLowerCase().includes(state.search) || c.shortDesc.toLowerCase().includes(state.search);
       const matchesCategory = state.category === "all" || c.category === state.category;
       const matchesMode = state.mode === "all" || c.mode.toLowerCase() === state.mode;
       const matchesInstructor = !state.instructor || c.instructorId === state.instructor;
-      return matchesSearch && matchesCategory && matchesMode && matchesInstructor;
+      const price = Number(c.price) || 0;
+      const matchesMin = state.priceMin == null || price >= state.priceMin;
+      const matchesMax = state.priceMax == null || price <= state.priceMax;
+      return matchesSearch && matchesCategory && matchesMode && matchesInstructor && matchesMin && matchesMax;
     });
+
+    if (state.sort === "price-asc") filtered = filtered.slice().sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+    else if (state.sort === "price-desc") filtered = filtered.slice().sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
 
     resultCount.textContent = `${filtered.length} course${filtered.length === 1 ? "" : "s"} found`;
 
@@ -155,7 +190,7 @@ async function initCourseDetailsPage() {
               <p class="instructor-subject">${instructor.subject}</p>
               ${typeof instructorTagsHTML === "function" ? instructorTagsHTML(instructor) : ""}
               ${instructor.location ? tagGroupHTML("location", "Location", `<p class="instructor-location">${instructor.location}</p>`) : ""}
-              <p class="bio">${instructor.bio}</p>
+              ${instructor.bio ? tagGroupHTML("about", "About", `<p class="bio">${instructor.bio}</p>`) : ""}
               ${instructor.availability ? tagGroupHTML("availability", "Availability", `<p class="instructor-availability">${instructor.availability}</p>`) : ""}
               <p class="instructor-exp">${instructor.experience} experience</p>
               <a href="instructors.html" class="btn btn-outline btn-sm">All Instructors</a>

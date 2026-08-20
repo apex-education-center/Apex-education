@@ -382,7 +382,8 @@ section { padding: var(--space-section) 0; }
   background: var(--coral);
   box-shadow: 0 0 6px rgba(255,107,84,0.7);
 }
-.lang-flag { font-size: 1.2rem; line-height: 1; }
+.lang-flag { display: flex; align-items: center; flex-shrink: 0; }
+.lang-flag svg { display: block; border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,0.08); }
 /* Hide Google's default translate banner/toolbar so only our button shows */
 .goog-te-banner-frame, .skiptranslate > iframe { display: none !important; }
 body { top: 0 !important; }
@@ -683,6 +684,9 @@ body { top: 0 !important; }
 .tag-group-location .tag-icon { color: var(--coral); }
 .tag-group-availability { background: var(--surface-tint); border-color: var(--border); }
 .tag-group-availability .tag-icon { color: var(--teal-deep); }
+.tag-group-about { background: rgba(15, 28, 31, 0.03); border-color: var(--border); }
+.tag-group-about .tag-icon { color: var(--text-faint); }
+.tag-group-about .bio { margin-bottom: 0; font-style: italic; }
 
 .instructor-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .badge {
@@ -961,6 +965,116 @@ body.cursor-fx-hover .cursor-fx-dot {
   border-color: var(--teal); background: var(--teal); color: #031014;
   box-shadow: var(--shadow-sm);
 }
+
+.filter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 28px;
+  margin-bottom: 32px;
+  padding: 18px 22px;
+  border-radius: var(--radius-md, 16px);
+  background: var(--surface-solid);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-xs);
+}
+.filter-sort, .range-field { display: flex; flex-direction: column; gap: 8px; }
+.filter-panel label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.filter-panel select {
+  padding: 9px 14px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border);
+  background: var(--surface-tint);
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.filter-panel select:focus { outline: none; border-color: var(--teal); }
+
+/* ---------- Dual-handle range slider ---------- */
+.range-field { min-width: 220px; flex: 1 1 220px; }
+.range-field-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.range-field-values {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--teal-deep);
+}
+.range-slider {
+  position: relative;
+  height: 30px;
+}
+.range-slider-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 4px;
+  background: var(--border-strong);
+}
+.range-slider-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--teal-deep), var(--teal-bright));
+}
+.range-slider input[type="range"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+  z-index: 3;
+}
+.range-slider input[type="range"]:focus { outline: none; }
+.range-slider input[type="range"]::-webkit-slider-runnable-track { background: transparent; }
+.range-slider input[type="range"]::-moz-range-track { background: transparent; border: none; }
+.range-slider input[type="range"]::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--teal-deep);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s var(--ease);
+}
+.range-slider input[type="range"]::-webkit-slider-thumb:hover,
+.range-slider input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.15); }
+.range-slider input[type="range"]::-moz-range-thumb {
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--teal-deep);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s var(--ease);
+}
+.range-slider input[type="range"]::-moz-range-thumb:hover,
+.range-slider input[type="range"]::-moz-range-thumb:active { transform: scale(1.15); }
 
 /* ---------- Glass / value / facts ---------- */
 .glass-panel {
