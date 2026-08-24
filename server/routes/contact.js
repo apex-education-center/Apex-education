@@ -71,13 +71,33 @@ router.get("/contact", requireAdmin, async (req, res) => {
   res.json(result.rows);
 });
 
+function toNewsletterDTO(row) {
+  return { id: row.id, email: row.email, phone: row.phone, createdAt: row.created_at };
+}
+
+/** Public: subscribe with email (required) and phone (optional). */
 router.post("/newsletter", async (req, res) => {
-  const { email: subEmail } = req.body;
+  const { email: subEmail, phone = "" } = req.body;
   if (!subEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(subEmail)) {
     return res.status(400).json({ error: "A valid email address is required." });
   }
-  await pool.query(`INSERT INTO newsletter_subscribers (email) VALUES ($1) ON CONFLICT (email) DO NOTHING`, [subEmail]);
+  await pool.query(
+    `INSERT INTO newsletter_subscribers (email, phone) VALUES ($1,$2)
+     ON CONFLICT (email) DO UPDATE SET phone = COALESCE(EXCLUDED.phone, newsletter_subscribers.phone)`,
+    [subEmail, phone || null]
+  );
   res.status(201).json({ ok: true });
+});
+
+/** Admin: list all subscribers (Admin → Newsletter panel). */
+router.get("/newsletter", requireAdmin, async (req, res) => {
+  const result = await pool.query(`SELECT * FROM newsletter_subscribers ORDER BY created_at DESC`);
+  res.json(result.rows.map(toNewsletterDTO));
+});
+
+router.delete("/newsletter/:id", requireAdmin, async (req, res) => {
+  await pool.query(`DELETE FROM newsletter_subscribers WHERE id = $1`, [req.params.id]);
+  res.json({ ok: true });
 });
 
 module.exports = router;

@@ -7,7 +7,7 @@ const calendar = require("../services/googleCalendar");
 
 const router = express.Router();
 
-function toDTO(row, courseTitle) {
+function toDTO(row, courseTitle, instructorName) {
   return {
     id: row.id,
     studentName: row.student_name,
@@ -15,6 +15,8 @@ function toDTO(row, courseTitle) {
     phone: row.phone,
     courseId: row.course_id,
     courseTitle: courseTitle || null,
+    instructorId: row.instructor_id,
+    instructorName: instructorName || null,
     notes: row.notes,
     status: row.status,
     meetingLink: row.meeting_link,
@@ -25,22 +27,23 @@ function toDTO(row, courseTitle) {
 
 router.get("/", requireAdmin, async (req, res) => {
   const result = await pool.query(
-    `SELECT r.*, c.title AS course_title FROM registrations r
+    `SELECT r.*, c.title AS course_title, i.name AS instructor_name FROM registrations r
      LEFT JOIN courses c ON c.id = r.course_id
+     LEFT JOIN instructors i ON i.id = r.instructor_id
      ORDER BY r.created_at DESC`
   );
-  res.json(result.rows.map((row) => toDTO(row, row.course_title)));
+  res.json(result.rows.map((row) => toDTO(row, row.course_title, row.instructor_name)));
 });
 
 router.post("/", async (req, res) => {
-  const { studentName, email: studentEmail, phone = "", courseId = null, notes = "" } = req.body;
+  const { studentName, email: studentEmail, phone = "", courseId = null, instructorId = null, notes = "" } = req.body;
   if (!studentName || !studentEmail) return res.status(400).json({ error: "Name and email are required." });
 
   const id = `reg-${crypto.randomUUID()}`;
   const result = await pool.query(
-    `INSERT INTO registrations (id, student_name, email, phone, course_id, notes, status)
-     VALUES ($1,$2,$3,$4,$5,$6,'pending') RETURNING *`,
-    [id, studentName, studentEmail, phone, courseId, notes]
+    `INSERT INTO registrations (id, student_name, email, phone, course_id, instructor_id, notes, status)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,'pending') RETURNING *`,
+    [id, studentName, studentEmail, phone, courseId, instructorId, notes]
   );
 
   // Notify admin/instructor — failure here shouldn't fail the registration itself.
@@ -55,6 +58,9 @@ router.post("/", async (req, res) => {
       );
       courseTitle = courseResult.rows[0]?.title || null;
       notifyTo = courseResult.rows[0]?.instructor_email || notifyTo;
+    } else if (instructorId) {
+      const instrResult = await pool.query(`SELECT email FROM instructors WHERE id = $1`, [instructorId]);
+      notifyTo = instrResult.rows[0]?.email || notifyTo;
     }
     if (notifyTo) {
       await email.sendNewRegistrationAlert({
@@ -84,9 +90,12 @@ router.post("/:id/confirm", requireAdmin, async (req, res) => {
   if (!meetingTime) return res.status(400).json({ error: "meetingTime (ISO datetime) is required to schedule the meeting." });
 
   const regResult = await pool.query(
-    `SELECT r.*, c.title AS course_title, i.email AS instructor_email FROM registrations r
+    `SELECT r.*, c.title AS course_title,
+            COALESCE(ci.email, pi.email) AS instructor_email
+     FROM registrations r
      LEFT JOIN courses c ON c.id = r.course_id
-     LEFT JOIN instructors i ON i.id = c.instructor_id
+     LEFT JOIN instructors ci ON ci.id = c.instructor_id
+     LEFT JOIN instructors pi ON pi.id = r.instructor_id
      WHERE r.id = $1`,
     [req.params.id]
   );

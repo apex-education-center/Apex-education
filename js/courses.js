@@ -20,6 +20,8 @@ async function initCoursesPage() {
   const searchInput = document.getElementById("courseSearch");
   const categoryFilterBar = document.getElementById("categoryFilterBar");
   const modeFilterBar = document.getElementById("modeFilterBar");
+  const languageFilterBar = document.getElementById("languageFilterBar");
+  const bacFilterBar = document.getElementById("bacFilterBarCourses");
   const priceSort = document.getElementById("priceSort");
   const emptyState = document.getElementById("coursesEmpty");
   const resultCount = document.getElementById("resultCount");
@@ -28,6 +30,8 @@ async function initCoursesPage() {
     search: "",
     category: getQueryParam("category") || "all",
     mode: "all",
+    language: "all",
+    bac: "all",
     instructor: getQueryParam("instructor") || null,
     sort: "default",
     priceMin: null,
@@ -77,6 +81,26 @@ async function initCoursesPage() {
     render();
   });
 
+  if (languageFilterBar) {
+    languageFilterBar.addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn");
+      if (!btn) return;
+      state.language = btn.dataset.language;
+      languageFilterBar.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
+      render();
+    });
+  }
+
+  if (bacFilterBar) {
+    bacFilterBar.addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn");
+      if (!btn) return;
+      state.bac = btn.dataset.bac;
+      bacFilterBar.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
+      render();
+    });
+  }
+
   searchInput.addEventListener("input", () => {
     state.search = searchInput.value.trim().toLowerCase();
     render();
@@ -94,11 +118,13 @@ async function initCoursesPage() {
       const matchesSearch = !state.search || c.title.toLowerCase().includes(state.search) || c.shortDesc.toLowerCase().includes(state.search);
       const matchesCategory = state.category === "all" || c.category === state.category;
       const matchesMode = state.mode === "all" || c.mode.toLowerCase() === state.mode;
+      const matchesLanguage = state.language === "all" || (c.languages || []).includes(state.language);
+      const matchesBac = state.bac === "all" || (c.bac || []).includes(state.bac);
       const matchesInstructor = !state.instructor || c.instructorId === state.instructor;
       const price = Number(c.price) || 0;
       const matchesMin = state.priceMin == null || price >= state.priceMin;
       const matchesMax = state.priceMax == null || price <= state.priceMax;
-      return matchesSearch && matchesCategory && matchesMode && matchesInstructor && matchesMin && matchesMax;
+      return matchesSearch && matchesCategory && matchesMode && matchesLanguage && matchesBac && matchesInstructor && matchesMin && matchesMax;
     });
 
     if (state.sort === "price-asc") filtered = filtered.slice().sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
@@ -185,7 +211,10 @@ async function initCourseDetailsPage() {
       ${
         instructor
           ? `<div class="instructor-card reveal">
-              <div class="instructor-avatar" style="${instructor.photo ? `background-image:url('${instructor.photo}');` : ""}">${instructor.photo ? "" : initials(instructor.name)}</div>
+              ${typeof nationalityBadgeHTML === "function" ? nationalityBadgeHTML(instructor) : ""}
+              <div class="instructor-avatar-wrap">
+                <div class="instructor-avatar" style="${instructor.photo ? `background-image:url('${instructor.photo}');` : ""}">${instructor.photo ? "" : initials(instructor.name)}</div>
+              </div>
               <h3>${instructor.name}</h3>
               <p class="instructor-subject">${instructor.subject}</p>
               ${typeof instructorTagsHTML === "function" ? instructorTagsHTML(instructor) : ""}

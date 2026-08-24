@@ -403,16 +403,19 @@ async function renderInstructorsPanel() {
     </div>
     <div class="admin-table-wrap">
       <table class="admin-table">
-        <thead><tr><th></th><th>Name</th><th>Subject</th><th>Mode</th><th>Location</th><th>Experience</th><th></th></tr></thead>
+        <thead><tr><th></th><th>Name</th><th>Subject</th><th>Nationality</th><th>Mode</th><th>Location</th><th>Experience</th><th></th></tr></thead>
         <tbody>
           ${instructors
             .map((i) => {
               const modes = i.modes && i.modes.length ? i.modes : (i.mode ? [i.mode] : []);
               const modeLabel = modes.length === 2 ? "Online + Présentiel" : modes.length === 1 ? (modes[0] === "online" ? "Online" : "Présentiel") : "—";
+              const natCodes = i.nationalities && i.nationalities.length ? i.nationalities : (i.nationality ? [i.nationality] : []);
+              const natLabel = natCodes.length ? natCodes.map((c) => NATIONALITY_OPTIONS[c] || c).join(" / ") : "—";
               return `<tr>
                 <td>${i.photo ? `<img src="${i.photo}" class="row-thumb" style="border-radius:50%;"/>` : `<div class="row-thumb" style="border-radius:50%;"></div>`}</td>
                 <td>${i.name}${i.email ? `<div style="color:var(--color-text-faint);font-size:0.78rem;">${i.email}</div>` : ""}</td>
                 <td>${i.subject}</td>
+                <td>${natLabel}</td>
                 <td>${modeLabel}</td>
                 <td>${i.location || "—"}</td>
                 <td>${i.experience}</td>
@@ -422,7 +425,7 @@ async function renderInstructorsPanel() {
                 </div></td>
               </tr>`;
             })
-            .join("") || emptyRow(7, "No instructors yet.")}
+            .join("") || emptyRow(8, "No instructors yet.")}
         </tbody>
       </table>
     </div>
@@ -441,11 +444,38 @@ async function renderInstructorsPanel() {
   );
 }
 
+const DAY_OPTIONS = [
+  { value: "sun", label: "Sun" },
+  { value: "mon", label: "Mon" },
+  { value: "tue", label: "Tue" },
+  { value: "wed", label: "Wed" },
+  { value: "thu", label: "Thu" },
+  { value: "fri", label: "Fri" },
+  { value: "sat", label: "Sat" },
+];
+
+/** Keep these codes in sync with NATIONALITY_FLAGS in main.js. */
+const NATIONALITY_OPTIONS = {
+  lb: "Lebanese",
+  fr: "French",
+  gb: "British",
+  us: "American",
+  ca: "Canadian",
+  de: "German",
+  gr: "Greek",
+  sy: "Syrian",
+  eg: "Egyptian",
+  jo: "Jordanian",
+  other: "Other",
+};
+
 function openInstructorModal(instructor) {
   const isEdit = Boolean(instructor);
   const modes = instructor?.modes && instructor.modes.length ? instructor.modes : (instructor?.mode ? [instructor.mode.toLowerCase()] : []);
   const bacValues = instructor?.bac && instructor.bac.length ? instructor.bac : (instructor?.bac ? [instructor.bac] : []);
   const langValues = instructor?.teachingLanguages && instructor.teachingLanguages.length ? instructor.teachingLanguages : [];
+  const availableDays = instructor?.availableDays && instructor.availableDays.length ? instructor.availableDays : [];
+  const natCodes = instructor?.nationalities && instructor.nationalities.length ? instructor.nationalities : (instructor?.nationality ? [instructor.nationality] : []);
 
   openModal(`
     <div class="modal-header"><h3>${isEdit ? "Edit Instructor" : "Add Instructor"}</h3><button class="modal-close">${iconSvgAdmin("close")}</button></div>
@@ -465,6 +495,24 @@ function openInstructorModal(instructor) {
       </div>
 
       <div class="form-group">
+        <label>Nationality <span class="field-hint" style="display:inline;">(shown as a flag ribbon on their card — pick a second one for a dual-nationality split ribbon)</span></label>
+        <div class="form-grid">
+          <select name="nationality1">
+            <option value="">— None —</option>
+            ${Object.entries(NATIONALITY_OPTIONS)
+              .map(([code, label]) => `<option value="${code}" ${natCodes[0] === code ? "selected" : ""}>${label}</option>`)
+              .join("")}
+          </select>
+          <select name="nationality2">
+            <option value="">— None (single flag) —</option>
+            ${Object.entries(NATIONALITY_OPTIONS)
+              .map(([code, label]) => `<option value="${code}" ${natCodes[1] === code ? "selected" : ""}>${label}</option>`)
+              .join("")}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label>Teaching Mode</label>
         <div class="checkbox-row">
           <label class="checkbox-pill"><input type="checkbox" name="modes" value="online" ${modes.includes("online") ? "checked" : ""}/> Online</label>
@@ -478,7 +526,16 @@ function openInstructorModal(instructor) {
       </div>
 
       <div class="form-group">
-        <label>Availability / Disponibilité <span class="field-hint" style="display:inline;">(shown to students)</span></label>
+        <label>Available Days <span class="field-hint" style="display:inline;">(shown to students, filterable)</span></label>
+        <div class="checkbox-row">
+          ${DAY_OPTIONS.map(
+            (d) => `<label class="checkbox-pill"><input type="checkbox" name="availableDays" value="${d.value}" ${availableDays.includes(d.value) ? "checked" : ""}/> ${d.label}</label>`
+          ).join("")}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Availability Notes <span class="field-hint" style="display:inline;">(optional, e.g. specific hours)</span></label>
         <textarea name="availability" rows="2" placeholder="e.g. Weekdays 4–8pm, Saturday mornings">${instructor?.availability || ""}</textarea>
       </div>
 
@@ -521,6 +578,8 @@ function openInstructorModal(instructor) {
       availability: fd.get("availability") ? fd.get("availability").trim() : "",
       bac: fd.getAll("bac"),
       teachingLanguages: fd.getAll("teachingLanguages"),
+      availableDays: fd.getAll("availableDays"),
+      nationalities: [fd.get("nationality1"), fd.get("nationality2")].filter(Boolean),
     };
     const ok = await runAction(
       () => (isEdit ? ApexDB.updateItem("instructors", instructor.id, payload) : ApexDB.addItem("instructors", payload)),
@@ -987,12 +1046,8 @@ async function renderHomepagePanel() {
         <div class="form-group"><label>Hero Title</label><input name="heroTitle" value="${hp.heroTitle || ""}"/></div>
         <div class="form-group"><label>Hero Subtitle</label><textarea name="heroSubtitle" rows="3">${hp.heroSubtitle || ""}</textarea></div>
         <div class="form-group"><label>About Summary</label><textarea name="aboutSummary" rows="3">${hp.aboutSummary || ""}</textarea></div>
-        <div class="form-grid">
-          <div class="form-group"><label>Students</label><input type="number" name="students" value="${stats.students ?? 0}"/></div>
-          <div class="form-group"><label>Courses</label><input type="number" name="courses" value="${stats.courses ?? 0}"/></div>
-          <div class="form-group"><label>Instructors</label><input type="number" name="instructors" value="${stats.instructors ?? 0}"/></div>
-          <div class="form-group"><label>Years Experience</label><input type="number" name="years" value="${stats.years ?? 0}"/></div>
-        </div>
+        <p class="field-hint" style="margin-bottom:10px;">"Students Taught," "Active Courses," and "Expert Instructors" on the homepage are now automatic — they always reflect your real Courses and Instructors panels (or a fixed 100 for students). Only "Years of Excellence" is set manually here, since there's no real data to calculate it from.</p>
+        <div class="form-group" style="max-width:220px;"><label>Years of Excellence</label><input type="number" name="years" value="${stats.years ?? 0}"/></div>
         <button type="submit" class="btn btn-primary">Save Homepage Content</button>
       </form>
     </div>
@@ -1008,9 +1063,6 @@ async function renderHomepagePanel() {
         aboutSummary: fd.get("aboutSummary").trim(),
       });
       await ApexDB.updateStats({
-        students: Number(fd.get("students")),
-        courses: Number(fd.get("courses")),
-        instructors: Number(fd.get("instructors")),
         years: Number(fd.get("years")),
       });
     }, "Homepage content saved.");

@@ -19,6 +19,8 @@ function toDTO(row) {
     availability: row.availability,
     bac: row.bac || [],
     teachingLanguages: row.teaching_languages || [],
+    availableDays: row.available_days || [],
+    nationalities: row.nationalities || [],
   };
 }
 
@@ -30,35 +32,40 @@ router.get("/", async (req, res) => {
 router.post("/", requireAdmin, async (req, res) => {
   const {
     name, subject, email = "", experience = "", bio = "", photo = "",
-    modes = [], location = "", availability = "", bac = [], teachingLanguages = [],
+    modes = [], location = "", availability = "", bac = [], teachingLanguages = [], availableDays = [],
+    nationalities = [],
   } = req.body;
   // Email is now optional — only name and subject are required.
   if (!name || !subject) return res.status(400).json({ error: "Name and subject are required." });
   const id = `instr-${crypto.randomUUID()}`;
   const result = await pool.query(
-    `INSERT INTO instructors (id, name, subject, email, experience, bio, photo, modes, location, availability, bac, teaching_languages)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+    `INSERT INTO instructors (id, name, subject, email, experience, bio, photo, modes, location, availability, bac, teaching_languages, available_days, nationalities)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
     [
       id, name, subject, email || null, experience, bio, photo,
-      JSON.stringify(modes), location, availability, JSON.stringify(bac), JSON.stringify(teachingLanguages),
+      JSON.stringify(modes), location, availability, JSON.stringify(bac), JSON.stringify(teachingLanguages), JSON.stringify(availableDays),
+      JSON.stringify((nationalities || []).slice(0, 2)),
     ]
   );
   res.status(201).json(toDTO(result.rows[0]));
 });
 
 router.patch("/:id", requireAdmin, async (req, res) => {
-  const { name, subject, email, experience, bio, photo, modes, location, availability, bac, teachingLanguages } = req.body;
+  const { name, subject, email, experience, bio, photo, modes, location, availability, bac, teachingLanguages, availableDays, nationalities } = req.body;
   const result = await pool.query(
     `UPDATE instructors SET
        name = COALESCE($2, name), subject = COALESCE($3, subject), email = $4,
        experience = COALESCE($5, experience), bio = COALESCE($6, bio), photo = COALESCE($7, photo),
        modes = COALESCE($8, modes), location = COALESCE($9, location), availability = COALESCE($10, availability),
-       bac = COALESCE($11, bac), teaching_languages = COALESCE($12, teaching_languages)
+       bac = COALESCE($11, bac), teaching_languages = COALESCE($12, teaching_languages),
+       available_days = COALESCE($13, available_days), nationalities = COALESCE($14, nationalities)
      WHERE id = $1 RETURNING *`,
     [
       req.params.id, name, subject, email || null, experience, bio, photo,
       modes ? JSON.stringify(modes) : null, location, availability,
       bac ? JSON.stringify(bac) : null, teachingLanguages ? JSON.stringify(teachingLanguages) : null,
+      availableDays ? JSON.stringify(availableDays) : null,
+      nationalities ? JSON.stringify(nationalities.slice(0, 2)) : null,
     ]
   );
   if (!result.rows[0]) return res.status(404).json({ error: "Instructor not found." });

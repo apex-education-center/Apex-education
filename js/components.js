@@ -21,22 +21,11 @@ const NAV_LINKS = [
    presented as a small branded dropdown instead of Google's default bar.
    No API key required. Pierre can add/remove languages by editing
    TRANSLATE_LANGUAGES below. */
+const LANG_FLAG_CDN_BASE = "https://cdn.jsdelivr.net/gh/lipis/flag-icons@7/flags/4x3/";
 const TRANSLATE_LANGUAGES = [
-  {
-    code: "en",
-    label: "English",
-    flag: `<svg viewBox="0 0 60 36" width="20" height="13"><rect width="60" height="36" fill="#00247d"/><path d="M0,0 60,36M60,0 0,36" stroke="#fff" stroke-width="6"/><path d="M0,0 60,36M60,0 0,36" stroke="#cf142b" stroke-width="2"/><path d="M30,0 30,36M0,18 60,18" stroke="#fff" stroke-width="10"/><path d="M30,0 30,36M0,18 60,18" stroke="#cf142b" stroke-width="6"/></svg>`,
-  },
-  {
-    code: "fr",
-    label: "Français",
-    flag: `<svg viewBox="0 0 3 2" width="20" height="13"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#FFFFFF"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>`,
-  },
-  {
-    code: "ar",
-    label: "العربية",
-    flag: `<svg viewBox="0 0 3 2" width="20" height="13"><rect width="3" height="2" fill="#ED1C24"/><rect y="0.5" width="3" height="1" fill="#fff"/><path d="M1.5,0.68 1.66,1.08 2.08,1.08 1.74,1.3 1.87,1.68 1.5,1.44 1.13,1.68 1.26,1.3 0.92,1.08 1.34,1.08Z" fill="#00A651"/></svg>`,
-  },
+  { code: "en", label: "English", flag: `<img src="${LANG_FLAG_CDN_BASE}gb.svg" alt="English" width="20" height="14"/>` },
+  { code: "fr", label: "Français", flag: `<img src="${LANG_FLAG_CDN_BASE}fr.svg" alt="Français" width="20" height="14"/>` },
+  { code: "ar", label: "العربية", flag: `<img src="${LANG_FLAG_CDN_BASE}lb.svg" alt="العربية" width="20" height="14"/>` },
 ];
 
 function getCookie(name) {

@@ -19,8 +19,8 @@ function getDisplayCategories(categories) {
   const list = (categories || []).filter((c) => !/litt[ée]rature|literature/i.test(c.name || ""));
   const has = (re) => list.some((c) => re.test(c.name || ""));
   const extras = [];
-  if (!has(/agenda/i)) extras.push({ id: "__agenda", name: "Agenda", icon: "calendar", __virtual: true });
-  if (!has(/informatique/i)) extras.push({ id: "__informatique", name: "Informatique", icon: "laptop", __virtual: true });
+  if (!has(/agenda|schedule/i)) extras.push({ id: "__agenda", name: "Schedule", icon: "calendar", __virtual: true });
+  if (!has(/informatique|computer science/i)) extras.push({ id: "__informatique", name: "Computer Science", icon: "laptop", __virtual: true });
   return [...list, ...extras];
 }
 
@@ -60,6 +60,7 @@ function courseCardHTML(course, instructor, category) {
       <div class="course-body">
         <span class="course-category">${category ? category.name : ""}</span>
         <h3>${course.title}</h3>
+        ${instructor ? `<div class="course-instructor"><span class="course-instructor-avatar" style="${instructor.photo ? `background-image:url('${instructor.photo}');` : ""}">${instructor.photo ? "" : initials(instructor.name)}</span>Taught by <strong>${instructor.name}</strong></div>` : ""}
         <p class="desc">${course.shortDesc}</p>
         ${courseCurriculumBadgesHTML(course)}
         <div class="course-meta">
@@ -81,7 +82,59 @@ const TAG_ICONS = {
   location: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
   availability: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
   about: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4Z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>`,
+  days: `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>`,
 };
+
+const DAY_LABELS = { sun: "Sun", mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat" };
+
+/** Nationality options for the instructor's corner ribbon. Codes match the
+ * admin form's <select>. "Other" falls back to a generic globe icon. */
+/** Real flag artwork from the widely-used, MIT-licensed "flag-icons" library
+ * (accurate official proportions/colors/emblems — no more hand-drawn
+ * approximations). Codes are standard ISO 3166-1 alpha-2. */
+const FLAG_CDN_BASE = "https://cdn.jsdelivr.net/gh/lipis/flag-icons@7/flags/4x3/";
+const NATIONALITY_FLAGS = {
+  lb: { label: "Lebanese", flagUrl: `${FLAG_CDN_BASE}lb.svg` },
+  fr: { label: "French", flagUrl: `${FLAG_CDN_BASE}fr.svg` },
+  gb: { label: "British", flagUrl: `${FLAG_CDN_BASE}gb.svg` },
+  us: { label: "American", flagUrl: `${FLAG_CDN_BASE}us.svg` },
+  ca: { label: "Canadian", flagUrl: `${FLAG_CDN_BASE}ca.svg` },
+  de: { label: "German", flagUrl: `${FLAG_CDN_BASE}de.svg` },
+  gr: { label: "Greek", flagUrl: `${FLAG_CDN_BASE}gr.svg` },
+  sy: { label: "Syrian", flagUrl: `${FLAG_CDN_BASE}sy.svg` },
+  eg: { label: "Egyptian", flagUrl: `${FLAG_CDN_BASE}eg.svg` },
+  jo: { label: "Jordanian", flagUrl: `${FLAG_CDN_BASE}jo.svg` },
+  // "Other" has no real flag — keep a generic globe icon for that case.
+  other: { label: "Other", svg: `<svg viewBox="0 0 24 24" preserveAspectRatio="none"><rect width="24" height="24" fill="#3A4750"/><g fill="none" stroke="#fff" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><line x1="3.5" y1="12" x2="20.5" y2="12"/><path d="M12 3.5c2.3 2.5 3.7 5.6 3.7 8.5s-1.4 6-3.7 8.5c-2.3-2.5-3.7-5.6-3.7-8.5s1.4-6 3.7-8.5Z"/></g></svg>` },
+};
+
+/** Renders a flag's artwork — a real flag image when available, or the
+ * generic globe SVG fallback for "other". */
+function nationalityFlagMarkup(nat) {
+  if (nat.flagUrl) return `<img src="${nat.flagUrl}" alt="${nat.label} flag" loading="lazy"/>`;
+  return nat.svg || "";
+}
+
+/** Diagonal corner ribbon showing the instructor's nationality flag. */
+/** Small circular flag badge(s) sitting on the corner of the instructor's
+ * avatar — supports the `nationalities` array (up to 2, shown as two
+ * overlapping badges) and falls back to the older single `nationality`
+ * field for existing records. */
+function nationalityBadgeHTML(instructor) {
+  const codes = (instructor.nationalities && instructor.nationalities.length ? instructor.nationalities : instructor.nationality ? [instructor.nationality] : [])
+    .filter((c) => NATIONALITY_FLAGS[c])
+    .slice(0, 2);
+  if (!codes.length) return "";
+
+  const nats = codes.map((c) => NATIONALITY_FLAGS[c]);
+  const badges = nats
+    .map(
+      (nat, i) =>
+        `<span class="nationality-badge" style="z-index:${nats.length - i};" title="${nat.label}"><span class="nationality-badge-flag">${nationalityFlagMarkup(nat)}</span></span>`
+    )
+    .join("");
+  return `<div class="nationality-badges ${nats.length === 2 ? "nationality-badges-dual" : ""}">${badges}</div>`;
+}
 
 function tagGroupHTML(iconKey, label, innerHTML) {
   return `<div class="tag-group tag-group-${iconKey}"><span class="tag-label"><span class="tag-icon">${TAG_ICONS[iconKey]}</span>${label}</span>${innerHTML}</div>`;
@@ -104,6 +157,7 @@ function instructorTagsHTML(instructor) {
   const modes = instructor.modes && instructor.modes.length ? instructor.modes : (instructor.mode ? [instructor.mode.toLowerCase()] : []);
   const bac = instructor.bac || [];
   const langs = instructor.teachingLanguages || [];
+  const days = instructor.availableDays || [];
 
   const modeBadges = modes
     .map((m) => (m === "online" ? `<span class="badge badge-teal">Online</span>` : `<span class="badge badge-accent">Présentiel</span>`))
@@ -114,11 +168,17 @@ function instructorTagsHTML(instructor) {
   const langBadges = langs
     .map((l) => `<span class="badge badge-lang">${l === "english" ? "English" : "Français"}</span>`)
     .join("");
+  const dayBadges = days
+    .slice()
+    .sort((a, b) => Object.keys(DAY_LABELS).indexOf(a) - Object.keys(DAY_LABELS).indexOf(b))
+    .map((d) => `<span class="badge badge-days">${DAY_LABELS[d] || d}</span>`)
+    .join("");
 
   let html = "";
   if (modeBadges) html += tagGroupHTML("mode", "Mode", `<div class="instructor-tags">${modeBadges}</div>`);
   if (bacBadges) html += tagGroupHTML("bac", "Bac", `<div class="instructor-tags">${bacBadges}</div>`);
   if (langBadges) html += tagGroupHTML("lang", "Language of study", `<div class="instructor-tags">${langBadges}</div>`);
+  if (dayBadges) html += tagGroupHTML("days", "Available Days", `<div class="instructor-tags">${dayBadges}</div>`);
   return html;
 }
 
@@ -127,7 +187,10 @@ function instructorCardHTML(instructor) {
   const bg = instructor.photo ? `background-image:url('${instructor.photo}');` : "";
   return `
     <div class="instructor-card reveal-stagger">
-      <div class="instructor-avatar" style="${bg}">${instructor.photo ? "" : initials(instructor.name)}</div>
+      ${nationalityBadgeHTML(instructor)}
+      <div class="instructor-avatar-wrap">
+        <div class="instructor-avatar" style="${bg}">${instructor.photo ? "" : initials(instructor.name)}</div>
+      </div>
       <h3>${instructor.name}</h3>
       <p class="instructor-subject">${instructor.subject}</p>
       ${instructorTagsHTML(instructor)}
@@ -613,6 +676,9 @@ async function initInstructorsPage() {
   const instructors = await ApexDB.getCollection("instructors");
   const subjects = Array.from(new Set(instructors.map((i) => i.subject)));
   const filterBar = document.getElementById("subjectFilterBar");
+  const dayFilterBar = document.getElementById("dayFilterBar");
+  const nationalityFilterBar = document.getElementById("nationalityFilterBar");
+  const bacFilterBar = document.getElementById("bacFilterBarInstructors");
   const sortSelect = document.getElementById("experienceSort");
   const resultCount = document.getElementById("instructorResultCount");
 
@@ -622,8 +688,11 @@ async function initInstructorsPage() {
     const match = String(instructor.experience || "").match(/\d+/);
     return match ? Number(match[0]) : 0;
   }
+  function instructorNationalities(instructor) {
+    return instructor.nationalities && instructor.nationalities.length ? instructor.nationalities : instructor.nationality ? [instructor.nationality] : [];
+  }
 
-  let state = { subject: "all", sort: "default", expMin: null, expMax: null };
+  let state = { subject: "all", sort: "default", expMin: null, expMax: null, days: new Set(), nationality: "all", bac: "all" };
 
   filterBar.innerHTML =
     `<button class="filter-btn active" data-subject="all">All Subjects</button>` +
@@ -636,6 +705,64 @@ async function initInstructorsPage() {
     state.subject = btn.dataset.subject;
     render();
   });
+
+  // Nationality filter — only shows chips for nationalities actually present
+  // among current instructors.
+  if (nationalityFilterBar) {
+    const presentCodes = Array.from(new Set(instructors.flatMap(instructorNationalities))).filter((c) => NATIONALITY_FLAGS[c]);
+    if (presentCodes.length) {
+      nationalityFilterBar.innerHTML =
+        `<button class="filter-btn active" data-nationality="all">All Nationalities</button>` +
+        presentCodes.map((c) => `<button class="filter-btn" data-nationality="${c}">${NATIONALITY_FLAGS[c].label}</button>`).join("");
+      nationalityFilterBar.addEventListener("click", (e) => {
+        const btn = e.target.closest(".filter-btn");
+        if (!btn) return;
+        nationalityFilterBar.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
+        state.nationality = btn.dataset.nationality;
+        render();
+      });
+    }
+  }
+
+  // Bac curriculum filter
+  if (bacFilterBar) {
+    bacFilterBar.addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn");
+      if (!btn) return;
+      bacFilterBar.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
+      state.bac = btn.dataset.bac;
+      render();
+    });
+  }
+
+  // Day-of-week availability filter — multi-select toggle chips, plus an
+  // "All" chip that resets to showing everyone (active by default).
+  if (dayFilterBar) {
+    dayFilterBar.addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn[data-day]");
+      if (!btn) return;
+      const day = btn.dataset.day;
+
+      if (day === "all") {
+        state.days.clear();
+        dayFilterBar.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b === btn));
+        render();
+        return;
+      }
+
+      if (state.days.has(day)) {
+        state.days.delete(day);
+        btn.classList.remove("active");
+      } else {
+        state.days.add(day);
+        btn.classList.add("active");
+      }
+      // No specific day selected anymore → fall back to "All" being active.
+      const allBtn = dayFilterBar.querySelector('[data-day="all"]');
+      if (allBtn) allBtn.classList.toggle("active", state.days.size === 0);
+      render();
+    });
+  }
 
   if (sortSelect) {
     sortSelect.addEventListener("change", () => {
@@ -668,7 +795,10 @@ async function initInstructorsPage() {
       const years = experienceYears(i);
       const matchesMin = state.expMin == null || years >= state.expMin;
       const matchesMax = state.expMax == null || years <= state.expMax;
-      return matchesSubject && matchesMin && matchesMax;
+      const matchesDays = state.days.size === 0 || (i.availableDays || []).some((d) => state.days.has(d));
+      const matchesNationality = state.nationality === "all" || instructorNationalities(i).includes(state.nationality);
+      const matchesBac = state.bac === "all" || (i.bac || []).includes(state.bac);
+      return matchesSubject && matchesMin && matchesMax && matchesDays && matchesNationality && matchesBac;
     });
 
     if (state.sort === "exp-asc") filtered = filtered.slice().sort((a, b) => experienceYears(a) - experienceYears(b));
@@ -891,8 +1021,17 @@ async function renderHomepage() {
     if (heroTitle && info.homepage) heroTitle.textContent = info.homepage.heroTitle;
     if (heroSubtitle && info.homepage) heroSubtitle.textContent = info.homepage.heroSubtitle;
 
-    // Stats
-    const statTargets = { statStudents: stats.students, statCourses: stats.courses, statInstructors: stats.instructors, statYears: stats.years };
+    // Stats — courses and instructors are always the real, live counts (so
+    // adding a course/instructor updates the homepage automatically, no
+    // manual number-entry needed). Students Taught is a fixed showcase
+    // number; Years of Excellence stays admin-editable since there's no
+    // real "years since founding" data to compute it from.
+    const statTargets = {
+      statStudents: 100,
+      statCourses: courses.length,
+      statInstructors: instructors.length,
+      statYears: stats.years,
+    };
     Object.entries(statTargets).forEach(([id, val]) => {
       const el = document.getElementById(id);
       if (el && val != null) el.dataset.target = val;
